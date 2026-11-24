@@ -1,0 +1,58 @@
+@model DocumentEditViewModel
+@{
+    var items = Model.Input.Expense.Items;
+    if (items.Count == 0) items.Add(new ExpenseItemInput());
+    const string placeholder = "__i__";
+}
+<div class="card">
+    <div class="card-header fw-semibold"><i class="bi bi-receipt me-2"></i>報銷資訊</div>
+    <div class="card-body row g-3">
+        <div class="col-md-6">
+            <label class="form-label required" for="Input_Expense_Purpose">報銷事由</label>
+            <input asp-for="Input.Expense.Purpose" class="form-control" maxlength="100" placeholder="例：客戶拜訪差旅費" />
+            <span asp-validation-for="Input.Expense.Purpose" class="invalid-feedback d-block"></span>
+        </div>
+        <div class="col-6 col-md-3">
+            <label class="form-label" for="Input_Expense_PaymentMethod">付款方式</label>
+            <select asp-for="Input.Expense.PaymentMethod" class="form-select">
+                @foreach (var p in Enum.GetValues<PaymentMethod>())
+                {
+                    <option value="@p">@p.ToDisplay()</option>
+                }
+            </select>
+        </div>
+        <div class="col-6 col-md-3">
+            <label class="form-label" for="Input_Expense_ProjectCode">專案代碼</label>
+            <input asp-for="Input.Expense.ProjectCode" class="form-control text-uppercase" maxlength="20" placeholder="選填" />
+            <span asp-validation-for="Input.Expense.ProjectCode" class="invalid-feedback d-block"></span>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold"><i class="bi bi-list-ol me-2"></i>費用明細</span>
+        <button type="button" class="btn btn-sm btn-outline-primary" data-line-add="expense"><i class="bi bi-plus-lg me-1"></i>新增一筆</button>
+    </div>
+    <div class="card-body">
+        <span asp-validation-for="Input.Expense.Items" class="invalid-feedback d-block mb-2"></span>
+        <div class="line-items" data-line-list="expense" data-prefix="Input.Expense.Items">
+            @for (var i = 0; i < items.Count; i++)
+            {
+                <partial name="_ExpenseItemRow" model="(items[i], i.ToString(), Model)" />
+            }
+        </div>
+        <template data-line-template="expense">
+            <partial name="_ExpenseItemRow" model="(new ExpenseItemInput(), placeholder, Model)" />
+        </template>
+        <div class="line-total">
+            合計 <strong>NT$ <span data-line-total="expense">0</span></strong>
+            <span class="small text-body-secondary ms-2">（送出時由系統重新加總）</span>
+        </div>
+        <div class="small text-body-secondary mt-2">
+            <i class="bi bi-info-circle"></i> 費用日期需在 @ApprovalFlow.Application.Documents.DocumentFormService.ExpenseDeadlineDays 日內；
+            @string.Join("、", Model.CategoryInfo.Where(c => c.IsActive && c.MaxAmountPerItem != null).Select(c => $"{c.Name}單筆上限 {c.MaxAmountPerItem:N0}"))。
+            標示「需收據」的類別需填發票號碼並上傳收據。
+        </div>
+    </div>
+</div>

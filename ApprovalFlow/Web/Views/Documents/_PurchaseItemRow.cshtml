@@ -1,0 +1,39 @@
+@model (PurchaseItemInput Item, string Index)
+@{
+    var it = Model.Item;
+    var p = $"Input.Purchase.Items[{Model.Index}]";
+    var errors = ViewContext.ViewData.ModelState
+        .Where(kv => kv.Key.StartsWith(p + ".", StringComparison.Ordinal))
+        .SelectMany(kv => kv.Value!.Errors.Select(e => e.ErrorMessage)).Distinct().ToList();
+}
+<div class="line-item" data-line-row>
+    <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-3">
+            <label class="form-label small mb-1">品名</label>
+            <input class="form-control form-control-sm" name="@(p).Name" value="@it.Name" maxlength="60" />
+        </div>
+        <div class="col-12 col-md-3">
+            <label class="form-label small mb-1">規格</label>
+            <input class="form-control form-control-sm" name="@(p).Specification" value="@it.Specification" maxlength="100" />
+        </div>
+        <div class="col-3 col-md-1">
+            <label class="form-label small mb-1">數量</label>
+            <input type="number" class="form-control form-control-sm text-end" name="@(p).Quantity" value="@it.Quantity?.ToString("0.##")" min="0" step="any" data-line-qty />
+        </div>
+        <div class="col-3 col-md-1">
+            <label class="form-label small mb-1">單位</label>
+            <input class="form-control form-control-sm" name="@(p).Unit" value="@it.Unit" maxlength="10" />
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-1">單價</label>
+            <input type="number" class="form-control form-control-sm text-end" name="@(p).UnitPrice" value="@it.UnitPrice?.ToString("0.##")" min="0" step="any" data-line-price />
+        </div>
+        <div class="col-9 col-md-1 text-end small pb-1">
+            <span class="text-body-secondary d-md-none">小計 </span><span data-line-subtotal>0</span>
+        </div>
+        <div class="col-3 col-md-1 text-end">
+            <button type="button" class="btn btn-sm btn-outline-danger" data-line-remove title="刪除此項" aria-label="刪除此項"><i class="bi bi-trash"></i></button>
+        </div>
+    </div>
+    @foreach (var e in errors) { <div class="invalid-feedback d-block">@e</div> }
+</div>

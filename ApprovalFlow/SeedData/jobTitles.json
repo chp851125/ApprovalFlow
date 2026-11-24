@@ -1,0 +1,56 @@
+[
+  {
+    "code": "T01",
+    "name": "總經理",
+    "rank": 90,
+    "sortOrder": 1,
+    "isActive": true,
+    "id": 1,
+    "version": 1
+  },
+  {
+    "code": "T02",
+    "name": "處長",
+    "rank": 70,
+    "sortOrder": 2,
+    "isActive": true,
+    "id": 2,
+    "version": 1
+  },
+  {
+    "code": "T03",
+    "name": "經理",
+    "rank": 60,
+    "sortOrder": 3,
+    "isActive": true,
+    "id": 3,
+    "version": 1
+  },
+  {
+    "code": "T04",
+    "name": "組長",
+    "rank": 40,
+    "sortOrder": 4,
+    "isActive": true,
+    "id": 4,
+    "version": 1
+  },
+  {
+    "code": "T05",
+    "name": "專員",
+    "rank": 20,
+    "sortOrder": 5,
+    "isActive": true,
+    "id": 5,
+    "version": 1
+  },
+  {
+    "code": "T06",
+    "name": "助理",
+    "rank": 10,
+    "sortOrder": 6,
+    "isActive": true,
+    "id": 6,
+    "version": 1
+  }
+]

@@ -1,0 +1,30 @@
+@model List<QuickSwitchItem>
+@{
+    var variant = ViewData["Variant"] as string;
+    var currentId = ViewData["CurrentId"] as int?;
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+<form method="post" asp-controller="Dev" asp-action="SwitchUser" class="quick-switch @(variant == "login" ? "w-100" : "")">
+    <input type="hidden" name="returnUrl" value="@returnUrl" />
+    <div class="input-group input-group-sm">
+        <span class="input-group-text bg-warning-subtle border-warning-subtle" title="開發模式：快速切換使用者">
+            <i class="bi bi-person-gear"></i>
+            @if (variant == "login")
+            {
+                <span class="ms-1">Demo 快速登入</span>
+            }
+        </span>
+        <select name="employeeId" class="form-select js-autosubmit" aria-label="快速切換使用者">
+            <option value="">@(variant == "login" ? "選擇身分直接登入…" : "切換使用者…")</option>
+            @foreach (var g in Model.GroupBy(i => i.Group))
+            {
+                <optgroup label="@g.Key">
+                    @foreach (var i in g)
+                    {
+                        <option value="@i.Id" selected="@(i.Id == currentId)">@i.Label</option>
+                    }
+                </optgroup>
+            }
+        </select>
+    </div>
+</form>

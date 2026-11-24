@@ -1,0 +1,40 @@
+@model DocumentEditViewModel
+<div class="card" data-overtime-form>
+    <div class="card-header fw-semibold"><i class="bi bi-moon-stars me-2"></i>加班內容</div>
+    <div class="card-body row g-3">
+        <div class="col-12 col-md-4">
+            <label class="form-label required" for="Input_Overtime_Date">加班日期</label>
+            <input asp-for="Input.Overtime.Date" type="date" class="form-control" />
+            <span asp-validation-for="Input.Overtime.Date" class="invalid-feedback d-block"></span>
+        </div>
+        <div class="col-6 col-md-4">
+            <label class="form-label required" for="Input_Overtime_StartTime">開始</label>
+            <input asp-for="Input.Overtime.StartTime" type="time" step="1800" class="form-control" data-ot-start />
+            <span asp-validation-for="Input.Overtime.StartTime" class="invalid-feedback d-block"></span>
+        </div>
+        <div class="col-6 col-md-4">
+            <label class="form-label required" for="Input_Overtime_EndTime">結束</label>
+            <input asp-for="Input.Overtime.EndTime" type="time" step="1800" class="form-control" data-ot-end />
+            <span asp-validation-for="Input.Overtime.EndTime" class="invalid-feedback d-block"></span>
+        </div>
+        <div class="col-12">
+            <div class="leave-calc small" data-ot-result aria-live="polite">
+                <i class="bi bi-calculator me-1"></i>工作日加班需在 18:00 後、單日最多 4 小時；休假日最多 12 小時；每月合計不超過 @ApprovalFlow.Application.Documents.DocumentFormService.MonthlyOvertimeCap.ToString("0") 小時。
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="Input_Overtime_Compensation">補償方式</label>
+            <select asp-for="Input.Overtime.Compensation" class="form-select">
+                @foreach (var c in Enum.GetValues<OvertimeCompensation>())
+                {
+                    <option value="@c">@c.ToDisplay()</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-8">
+            <label class="form-label required" for="Input_Overtime_Reason">加班事由</label>
+            <input asp-for="Input.Overtime.Reason" class="form-control" maxlength="200" placeholder="例：月底結帳、客戶系統上線支援" />
+            <span asp-validation-for="Input.Overtime.Reason" class="invalid-feedback d-block"></span>
+        </div>
+    </div>
+</div>

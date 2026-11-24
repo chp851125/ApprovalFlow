@@ -1,0 +1,42 @@
+[
+  {
+    "code": "GMO",
+    "name": "總經理室",
+    "parentId": null,
+    "managerId": 1,
+    "sortOrder": 1,
+    "isActive": true,
+    "id": 1,
+    "version": 1
+  },
+  {
+    "code": "ADM",
+    "name": "管理處",
+    "parentId": 1,
+    "managerId": 3,
+    "sortOrder": 2,
+    "isActive": true,
+    "id": 2,
+    "version": 1
+  },
+  {
+    "code": "FIN",
+    "name": "財務會計部",
+    "parentId": 2,
+    "managerId": 9,
+    "sortOrder": 3,
+    "isActive": true,
+    "id": 3,
+    "version": 1
+  },
+  {
+    "code": "SAL",
+    "name": "業務部",
+    "parentId": 1,
+    "managerId": 13,
+    "sortOrder": 4,
+    "isActive": true,
+    "id": 4,
+    "version": 1
+  }
+]

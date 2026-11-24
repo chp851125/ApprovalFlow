@@ -1,0 +1,947 @@
+[
+  {
+    "employeeId": 1,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 152,
+    "openingUsedHours": 0,
+    "id": 1,
+    "version": 1
+  },
+  {
+    "employeeId": 1,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 2,
+    "version": 1
+  },
+  {
+    "employeeId": 1,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 3,
+    "version": 1
+  },
+  {
+    "employeeId": 1,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 4,
+    "version": 1
+  },
+  {
+    "employeeId": 1,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 5,
+    "version": 1
+  },
+  {
+    "employeeId": 2,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 120,
+    "openingUsedHours": 0,
+    "id": 6,
+    "version": 1
+  },
+  {
+    "employeeId": 2,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 7,
+    "version": 1
+  },
+  {
+    "employeeId": 2,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 8,
+    "version": 1
+  },
+  {
+    "employeeId": 2,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 9,
+    "version": 1
+  },
+  {
+    "employeeId": 2,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 10,
+    "version": 1
+  },
+  {
+    "employeeId": 3,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 136,
+    "openingUsedHours": 0,
+    "id": 11,
+    "version": 1
+  },
+  {
+    "employeeId": 3,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 12,
+    "version": 1
+  },
+  {
+    "employeeId": 3,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 13,
+    "version": 1
+  },
+  {
+    "employeeId": 3,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 14,
+    "version": 1
+  },
+  {
+    "employeeId": 3,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 15,
+    "version": 1
+  },
+  {
+    "employeeId": 4,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 120,
+    "openingUsedHours": 0,
+    "id": 16,
+    "version": 1
+  },
+  {
+    "employeeId": 4,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 17,
+    "version": 1
+  },
+  {
+    "employeeId": 4,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 18,
+    "version": 1
+  },
+  {
+    "employeeId": 4,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 19,
+    "version": 1
+  },
+  {
+    "employeeId": 4,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 20,
+    "version": 1
+  },
+  {
+    "employeeId": 5,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 21,
+    "version": 1
+  },
+  {
+    "employeeId": 5,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 22,
+    "version": 1
+  },
+  {
+    "employeeId": 5,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 23,
+    "version": 1
+  },
+  {
+    "employeeId": 5,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 24,
+    "version": 1
+  },
+  {
+    "employeeId": 5,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 25,
+    "version": 1
+  },
+  {
+    "employeeId": 6,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 26,
+    "version": 1
+  },
+  {
+    "employeeId": 6,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 27,
+    "version": 1
+  },
+  {
+    "employeeId": 6,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 28,
+    "version": 1
+  },
+  {
+    "employeeId": 6,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 29,
+    "version": 1
+  },
+  {
+    "employeeId": 6,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 30,
+    "version": 1
+  },
+  {
+    "employeeId": 7,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 120,
+    "openingUsedHours": 0,
+    "id": 31,
+    "version": 1
+  },
+  {
+    "employeeId": 7,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 32,
+    "version": 1
+  },
+  {
+    "employeeId": 7,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 33,
+    "version": 1
+  },
+  {
+    "employeeId": 7,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 34,
+    "version": 1
+  },
+  {
+    "employeeId": 7,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 35,
+    "version": 1
+  },
+  {
+    "employeeId": 8,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 80,
+    "openingUsedHours": 0,
+    "id": 36,
+    "version": 1
+  },
+  {
+    "employeeId": 8,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 37,
+    "version": 1
+  },
+  {
+    "employeeId": 8,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 38,
+    "version": 1
+  },
+  {
+    "employeeId": 8,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 39,
+    "version": 1
+  },
+  {
+    "employeeId": 8,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 40,
+    "version": 1
+  },
+  {
+    "employeeId": 9,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 136,
+    "openingUsedHours": 0,
+    "id": 41,
+    "version": 1
+  },
+  {
+    "employeeId": 9,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 42,
+    "version": 1
+  },
+  {
+    "employeeId": 9,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 43,
+    "version": 1
+  },
+  {
+    "employeeId": 9,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 44,
+    "version": 1
+  },
+  {
+    "employeeId": 9,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 45,
+    "version": 1
+  },
+  {
+    "employeeId": 10,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 120,
+    "openingUsedHours": 0,
+    "id": 46,
+    "version": 1
+  },
+  {
+    "employeeId": 10,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 47,
+    "version": 1
+  },
+  {
+    "employeeId": 10,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 48,
+    "version": 1
+  },
+  {
+    "employeeId": 10,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 49,
+    "version": 1
+  },
+  {
+    "employeeId": 10,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 50,
+    "version": 1
+  },
+  {
+    "employeeId": 11,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 120,
+    "openingUsedHours": 0,
+    "id": 51,
+    "version": 1
+  },
+  {
+    "employeeId": 11,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 52,
+    "version": 1
+  },
+  {
+    "employeeId": 11,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 53,
+    "version": 1
+  },
+  {
+    "employeeId": 11,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 54,
+    "version": 1
+  },
+  {
+    "employeeId": 11,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 55,
+    "version": 1
+  },
+  {
+    "employeeId": 12,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 56,
+    "openingUsedHours": 0,
+    "id": 56,
+    "version": 1
+  },
+  {
+    "employeeId": 12,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 57,
+    "version": 1
+  },
+  {
+    "employeeId": 12,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 58,
+    "version": 1
+  },
+  {
+    "employeeId": 12,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 59,
+    "version": 1
+  },
+  {
+    "employeeId": 12,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 60,
+    "version": 1
+  },
+  {
+    "employeeId": 13,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 144,
+    "openingUsedHours": 0,
+    "id": 61,
+    "version": 1
+  },
+  {
+    "employeeId": 13,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 62,
+    "version": 1
+  },
+  {
+    "employeeId": 13,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 63,
+    "version": 1
+  },
+  {
+    "employeeId": 13,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 64,
+    "version": 1
+  },
+  {
+    "employeeId": 13,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 65,
+    "version": 1
+  },
+  {
+    "employeeId": 14,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 120,
+    "openingUsedHours": 0,
+    "id": 66,
+    "version": 1
+  },
+  {
+    "employeeId": 14,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 67,
+    "version": 1
+  },
+  {
+    "employeeId": 14,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 68,
+    "version": 1
+  },
+  {
+    "employeeId": 14,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 69,
+    "version": 1
+  },
+  {
+    "employeeId": 14,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 70,
+    "version": 1
+  },
+  {
+    "employeeId": 15,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 120,
+    "openingUsedHours": 0,
+    "id": 71,
+    "version": 1
+  },
+  {
+    "employeeId": 15,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 72,
+    "version": 1
+  },
+  {
+    "employeeId": 15,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 73,
+    "version": 1
+  },
+  {
+    "employeeId": 15,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 74,
+    "version": 1
+  },
+  {
+    "employeeId": 15,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 75,
+    "version": 1
+  },
+  {
+    "employeeId": 16,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 120,
+    "openingUsedHours": 0,
+    "id": 76,
+    "version": 1
+  },
+  {
+    "employeeId": 16,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 77,
+    "version": 1
+  },
+  {
+    "employeeId": 16,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 78,
+    "version": 1
+  },
+  {
+    "employeeId": 16,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 79,
+    "version": 1
+  },
+  {
+    "employeeId": 16,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 80,
+    "version": 1
+  },
+  {
+    "employeeId": 17,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 81,
+    "version": 1
+  },
+  {
+    "employeeId": 17,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 82,
+    "version": 1
+  },
+  {
+    "employeeId": 17,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 83,
+    "version": 1
+  },
+  {
+    "employeeId": 17,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 84,
+    "version": 1
+  },
+  {
+    "employeeId": 17,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 85,
+    "version": 1
+  },
+  {
+    "employeeId": 18,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 86,
+    "version": 1
+  },
+  {
+    "employeeId": 18,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 87,
+    "version": 1
+  },
+  {
+    "employeeId": 18,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 88,
+    "version": 1
+  },
+  {
+    "employeeId": 18,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 89,
+    "version": 1
+  },
+  {
+    "employeeId": 18,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 90,
+    "version": 1
+  },
+  {
+    "employeeId": 19,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 56,
+    "openingUsedHours": 0,
+    "id": 91,
+    "version": 1
+  },
+  {
+    "employeeId": 19,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 92,
+    "version": 1
+  },
+  {
+    "employeeId": 19,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 93,
+    "version": 1
+  },
+  {
+    "employeeId": 19,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 94,
+    "version": 1
+  },
+  {
+    "employeeId": 19,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 95,
+    "version": 1
+  },
+  {
+    "employeeId": 20,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 120,
+    "openingUsedHours": 0,
+    "id": 96,
+    "version": 1
+  },
+  {
+    "employeeId": 20,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 97,
+    "version": 1
+  },
+  {
+    "employeeId": 20,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 98,
+    "version": 1
+  },
+  {
+    "employeeId": 20,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 99,
+    "version": 1
+  },
+  {
+    "employeeId": 20,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 100,
+    "version": 1
+  },
+  {
+    "employeeId": 21,
+    "leaveTypeId": 1,
+    "year": 2026,
+    "entitledHours": 56,
+    "openingUsedHours": 0,
+    "id": 101,
+    "version": 1
+  },
+  {
+    "employeeId": 21,
+    "leaveTypeId": 2,
+    "year": 2026,
+    "entitledHours": 112,
+    "openingUsedHours": 0,
+    "id": 102,
+    "version": 1
+  },
+  {
+    "employeeId": 21,
+    "leaveTypeId": 3,
+    "year": 2026,
+    "entitledHours": 240,
+    "openingUsedHours": 0,
+    "id": 103,
+    "version": 1
+  },
+  {
+    "employeeId": 21,
+    "leaveTypeId": 4,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 104,
+    "version": 1
+  },
+  {
+    "employeeId": 21,
+    "leaveTypeId": 5,
+    "year": 2026,
+    "entitledHours": 64,
+    "openingUsedHours": 0,
+    "id": 105,
+    "version": 1
+  }
+]

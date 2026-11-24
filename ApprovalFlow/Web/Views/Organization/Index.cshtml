@@ -1,0 +1,104 @@
+@model OrganizationIndexViewModel
+@{
+    ViewData["Title"] = "組織架構";
+    var isDept = Model.Tab == "dept";
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">組織架構</h1>
+        <div class="text-body-secondary small">部門的上下層關係與部門主管會影響簽核流程中「部門主管」「上 N 級主管」的判斷。</div>
+    </div>
+    <div class="d-flex gap-2">
+        @if (isDept)
+        {
+            <a class="btn btn-primary" asp-action="CreateDepartment"><i class="bi bi-plus-lg me-1"></i>新增部門</a>
+        }
+        else
+        {
+            <a class="btn btn-primary" asp-action="CreateJobTitle"><i class="bi bi-plus-lg me-1"></i>新增職稱</a>
+        }
+    </div>
+</div>
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><a class="nav-link @(isDept ? "active" : "")" asp-action="Index" asp-route-tab="dept"><i class="bi bi-diagram-3 me-1"></i>部門（@Model.Departments.Count）</a></li>
+    <li class="nav-item"><a class="nav-link @(!isDept ? "active" : "")" asp-action="Index" asp-route-tab="title"><i class="bi bi-award me-1"></i>職稱（@Model.JobTitles.Count）</a></li>
+</ul>
+
+@if (isDept)
+{
+    <div class="card">
+        <ul class="list-group list-group-flush">
+            @foreach (var n in Model.Departments)
+            {
+                var d = n.Department;
+                <li class="list-group-item py-3 @(d.IsActive ? "" : "bg-body-tertiary")">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <div class="min-w-0 flex-grow-1 dept-node dept-depth-@Math.Min(n.Depth, 5)">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi @(n.Depth == 0 ? "bi-building" : "bi-arrow-return-right") text-body-secondary"></i>
+                                <span class="fw-semibold">@d.Name</span>
+                                <span class="badge text-bg-light border">@d.Code</span>
+                                @if (!d.IsActive) { <span class="badge text-bg-secondary">已停用</span> }
+                            </div>
+                            <div class="small text-body-secondary mt-1">
+                                <i class="bi bi-person-badge"></i> 主管：@(n.ManagerName ?? "（未設定）")
+                                <span class="mx-2">|</span><i class="bi bi-people"></i> 在職 @n.Headcount 人
+                            </div>
+                        </div>
+                        <div class="d-flex gap-1 flex-shrink-0">
+                            <a class="btn btn-sm btn-outline-secondary" asp-controller="Employees" asp-action="Index" asp-route-departmentId="@d.Id" title="查看成員"><i class="bi bi-people"></i><span class="d-none d-md-inline ms-1">成員</span></a>
+                            @if (d.IsActive)
+                            {
+                                <a class="btn btn-sm btn-outline-secondary" asp-action="CreateDepartment" asp-route-parentId="@d.Id" title="新增下層部門"><i class="bi bi-node-plus"></i><span class="d-none d-md-inline ms-1">下層</span></a>
+                            }
+                            <a class="btn btn-sm btn-outline-primary" asp-action="EditDepartment" asp-route-id="@d.Id"><i class="bi bi-pencil"></i><span class="d-none d-md-inline ms-1">編輯</span></a>
+                            <form method="post" asp-action="ToggleDepartment" class="d-inline"
+                                  data-confirm="@(d.IsActive ? $"確定要停用「{d.Name}」嗎？" : $"確定要啟用「{d.Name}」嗎？")">
+                                <input type="hidden" name="id" value="@d.Id" />
+                                <input type="hidden" name="version" value="@d.Version" />
+                                <input type="hidden" name="active" value="@((!d.IsActive).ToString().ToLowerInvariant())" />
+                                <button type="submit" class="btn btn-sm @(d.IsActive ? "btn-outline-danger" : "btn-outline-success")" title="@(d.IsActive ? "停用" : "啟用")">
+                                    <i class="bi @(d.IsActive ? "bi-slash-circle" : "bi-check-circle")"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr><th>代碼</th><th>職稱</th><th class="text-center">職等</th><th class="text-center">在職人數</th><th class="text-center">狀態</th><th class="text-end">操作</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model.JobTitles)
+                    {
+                        <tr class="@(t.IsActive ? "" : "text-body-secondary")">
+                            <td><span class="badge text-bg-light border">@t.Code</span></td>
+                            <td class="fw-semibold">@t.Name</td>
+                            <td class="text-center">@t.Rank</td>
+                            <td class="text-center">@Model.TitleHeadcount.GetValueOrDefault(t.Id)</td>
+                            <td class="text-center">@if (t.IsActive) { <span class="badge text-bg-success">啟用</span> } else { <span class="badge text-bg-secondary">停用</span> }</td>
+                            <td class="text-end text-nowrap">
+                                <a class="btn btn-sm btn-outline-primary" asp-action="EditJobTitle" asp-route-id="@t.Id"><i class="bi bi-pencil"></i></a>
+                                <form method="post" asp-action="ToggleJobTitle" class="d-inline" data-confirm="@(t.IsActive ? $"確定要停用職稱「{t.Name}」嗎？" : $"確定要啟用職稱「{t.Name}」嗎？")">
+                                    <input type="hidden" name="id" value="@t.Id" />
+                                    <input type="hidden" name="version" value="@t.Version" />
+                                    <input type="hidden" name="active" value="@((!t.IsActive).ToString().ToLowerInvariant())" />
+                                    <button type="submit" class="btn btn-sm @(t.IsActive ? "btn-outline-danger" : "btn-outline-success")"><i class="bi @(t.IsActive ? "bi-slash-circle" : "bi-check-circle")"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

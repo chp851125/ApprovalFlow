@@ -1,0 +1,123 @@
+@model EmployeeIndexViewModel
+@{
+    ViewData["Title"] = "員工帳號";
+    var f = Model.Filter;
+    string StatusUrl(string s) => Url.Action("Index", new { q = f.Q, departmentId = f.DepartmentId, role = f.Role, status = s })!;
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">員工帳號</h1>
+        <div class="text-body-secondary small">在職 @Model.ActiveCount 人・離職 @Model.InactiveCount 人@(Model.LockedCount > 0 ? $"・鎖定中 {Model.LockedCount} 人" : "")</div>
+    </div>
+    <a class="btn btn-primary" asp-action="Create" asp-route-departmentId="@f.DepartmentId"><i class="bi bi-person-plus me-1"></i>新增員工</a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" asp-action="Index" class="row g-2 align-items-end">
+            <input type="hidden" name="status" value="@f.Status" />
+            <div class="col-12 col-md-4">
+                <label class="form-label small mb-1" for="q">關鍵字</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="search" class="form-control" id="q" name="q" value="@f.Q" placeholder="姓名、帳號、員編、Email、分機" />
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label small mb-1" for="departmentId">部門（含下層）</label>
+                <select class="form-select" id="departmentId" name="departmentId" asp-items="Model.Departments">
+                    <option value="">全部部門</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label small mb-1" for="role">角色</label>
+                <select class="form-select" id="role" name="role">
+                    <option value="">全部角色</option>
+                    @foreach (var r in Roles.All)
+                    {
+                        <option value="@r" selected="@(r == f.Role)">@Roles.ToDisplay(r)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-12 col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1"><i class="bi bi-funnel me-1"></i>篩選</button>
+                <a asp-action="Index" class="btn btn-outline-secondary" title="清除條件"><i class="bi bi-x-lg"></i></a>
+            </div>
+        </form>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            @foreach (var (key, label) in new[] { ("active", "在職"), ("inactive", "離職/停用"), ("locked", "鎖定中"), ("all", "全部") })
+            {
+                <a class="btn btn-sm rounded-pill @(f.Status == key ? "btn-dark" : "btn-outline-secondary")" href="@StatusUrl(key)">@label</a>
+            }
+        </div>
+    </div>
+</div>
+
+@if (Model.Rows.TotalCount == 0)
+{
+    <div class="card"><div class="card-body empty-state py-5">
+        <div class="empty-state-icon"><i class="bi bi-person-x"></i></div>
+        <p class="text-body-secondary mb-0">沒有符合條件的員工</p>
+    </div></div>
+}
+else
+{
+    @* 桌機：表格 *@
+    <div class="card d-none d-md-block">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr><th>員編</th><th>姓名 / 帳號</th><th>部門・職稱</th><th>直屬主管</th><th>角色</th><th class="text-center">狀態</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model.Rows.Items)
+                    {
+                        var e = r.Employee;
+                        <tr class="@(e.IsActive ? "" : "text-body-secondary")">
+                            <td class="text-nowrap">@e.EmployeeNo</td>
+                            <td>
+                                <a class="fw-semibold text-decoration-none" asp-action="Details" asp-route-id="@e.Id">@e.Name</a>
+                                <div class="small text-body-secondary">@e.Account</div>
+                            </td>
+                            <td>@r.DepartmentName<div class="small text-body-secondary">@r.TitleName</div></td>
+                            <td>@(r.ManagerName ?? "—")</td>
+                            <td>
+                                @foreach (var role in e.Roles.Where(x => x != Roles.Applicant))
+                                {
+                                    <span class="badge role-badge role-@role.ToLowerInvariant()">@Roles.ToDisplay(role)</span>
+                                }
+                            </td>
+                            <td class="text-center text-nowrap">
+                                <partial name="_EmployeeStatus" model="r" />
+                            </td>
+                            <td class="text-end"><a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@e.Id">檢視</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @* 手機：卡片 *@
+    <div class="d-md-none vstack gap-2">
+        @foreach (var r in Model.Rows.Items)
+        {
+            var e = r.Employee;
+            <a class="card card-hover text-decoration-none text-body" asp-action="Details" asp-route-id="@e.Id">
+                <div class="card-body py-3 d-flex gap-3 align-items-center">
+                    <span class="avatar avatar-lg @(e.IsActive ? "bg-primary-subtle text-primary" : "bg-secondary-subtle text-secondary")">@e.Name[..1]</span>
+                    <div class="min-w-0 flex-grow-1">
+                        <div class="d-flex justify-content-between gap-2">
+                            <span class="fw-semibold text-truncate">@e.Name <small class="text-body-secondary fw-normal">@e.Account</small></span>
+                            <partial name="_EmployeeStatus" model="r" />
+                        </div>
+                        <div class="small text-body-secondary text-truncate">@e.EmployeeNo・@r.DepartmentName・@r.TitleName</div>
+                    </div>
+                    <i class="bi bi-chevron-right text-body-secondary"></i>
+                </div>
+            </a>
+        }
+    </div>
+}
+
+<partial name="_Pager" model="Model.Pager" />

@@ -1,0 +1,41 @@
+@model DocumentEditViewModel
+<div class="card" data-leave-form>
+    <div class="card-header fw-semibold"><i class="bi bi-calendar2-week me-2"></i>請假內容</div>
+    <div class="card-body row g-3">
+        <div class="col-md-4">
+            <label class="form-label required" for="Input_Leave_LeaveTypeId">假別</label>
+            <select asp-for="Input.Leave.LeaveTypeId" asp-items="Model.LeaveTypes" class="form-select" data-leave-type>
+                <option value="0">請選擇</option>
+            </select>
+            <span asp-validation-for="Input.Leave.LeaveTypeId" class="invalid-feedback d-block"></span>
+        </div>
+        <div class="col-6 col-md-4">
+            <label class="form-label required" for="Input_Leave_StartAt">開始</label>
+            <input asp-for="Input.Leave.StartAt" type="datetime-local" step="1800" class="form-control" data-leave-start />
+            <span asp-validation-for="Input.Leave.StartAt" class="invalid-feedback d-block"></span>
+        </div>
+        <div class="col-6 col-md-4">
+            <label class="form-label required" for="Input_Leave_EndAt">結束</label>
+            <input asp-for="Input.Leave.EndAt" type="datetime-local" step="1800" class="form-control" data-leave-end />
+            <span asp-validation-for="Input.Leave.EndAt" class="invalid-feedback d-block"></span>
+        </div>
+        <div class="col-12">
+            <div class="leave-calc small" data-leave-result aria-live="polite">
+                <i class="bi bi-calculator me-1"></i>請假時數會依工作時段（09:00–12:00、13:00–18:00）扣除午休、週末與國定假日自動計算。
+            </div>
+        </div>
+        <div class="col-md-8">
+            <label class="form-label required" for="Input_Leave_Reason">請假事由</label>
+            <input asp-for="Input.Leave.Reason" class="form-control" maxlength="200" />
+            <span asp-validation-for="Input.Leave.Reason" class="invalid-feedback d-block"></span>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="Input_Leave_DeputyId">職務代理人</label>
+            <select asp-for="Input.Leave.DeputyId" asp-items="Model.Colleagues" class="form-select">
+                <option value="">（無）</option>
+            </select>
+            <div class="form-text">會自動加入抄送。</div>
+            <span asp-validation-for="Input.Leave.DeputyId" class="invalid-feedback d-block"></span>
+        </div>
+    </div>
+</div>

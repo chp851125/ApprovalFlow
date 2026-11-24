@@ -1,0 +1,26 @@
+@model EmailMessage
+@{
+    ViewData["Title"] = Model.Subject;
+}
+<div class="page-header">
+    <div class="min-w-0">
+        <nav aria-label="breadcrumb"><ol class="breadcrumb small mb-1"><li class="breadcrumb-item"><a asp-action="Emails">Email 寄送紀錄</a></li><li class="breadcrumb-item active">#@Model.Id</li></ol></nav>
+        <h1 class="page-title text-break">@Model.Subject</h1>
+    </div>
+    @if (Model.FileName != null)
+    {
+        <a class="btn btn-outline-primary" asp-action="Eml" asp-route-id="@Model.Id"><i class="bi bi-download me-1"></i>下載 .eml</a>
+    }
+</div>
+<div class="card form-card">
+    <div class="card-body">
+        <dl class="row dl-compact">
+            <dt class="col-3">收件者</dt><dd class="col-9">@ViewData["RecipientName"] &lt;@Model.To&gt;</dd>
+            <dt class="col-3">建立時間</dt><dd class="col-9">@Model.CreatedAt.ToString("yyyy/MM/dd HH:mm:ss")</dd>
+            <dt class="col-3">狀態</dt><dd class="col-9">@Model.Status.ToDisplay()@(Model.Error != null ? $"：{Model.Error}" : "")</dd>
+            <dt class="col-3">檔案</dt><dd class="col-9"><code>outbox/@Model.FileName</code></dd>
+        </dl>
+        <div class="small text-body-secondary mb-1">純文字內容（HTML 版本請下載 .eml 檢視）</div>
+        <pre class="email-body">@Model.Body</pre>
+    </div>
+</div>

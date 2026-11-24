@@ -1,0 +1,44 @@
+@model LoginViewModel
+@inject IWebHostEnvironment Env
+@inject IConfiguration Config
+@{
+    ViewData["Title"] = "登入";
+    Layout = "_AuthLayout";
+    var hint = Env.IsDevelopment() ? Config["Demo:LoginHint"] : null;
+}
+<form method="post" asp-action="Login" novalidate>
+    <input type="hidden" asp-for="ReturnUrl" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+    <div class="form-floating mb-3">
+        <input asp-for="Account" class="form-control" placeholder="帳號" autocomplete="username" autofocus />
+        <label asp-for="Account"></label>
+        <span asp-validation-for="Account" class="invalid-feedback d-block"></span>
+    </div>
+    <div class="form-floating mb-3">
+        <input asp-for="Password" class="form-control" placeholder="密碼" autocomplete="current-password" />
+        <label asp-for="Password"></label>
+        <span asp-validation-for="Password" class="invalid-feedback d-block"></span>
+    </div>
+    <div class="form-check mb-3">
+        <input asp-for="RememberMe" class="form-check-input" />
+        <label asp-for="RememberMe" class="form-check-label"></label>
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg w-100">
+        <i class="bi bi-box-arrow-in-right me-1"></i>登入
+    </button>
+</form>
+
+@if (Env.IsDevelopment())
+{
+    <hr class="my-4" />
+    @await Component.InvokeAsync("QuickSwitch", new { variant = "login" })
+    @if (!string.IsNullOrEmpty(hint))
+    {
+        <p class="small text-body-secondary mt-2 mb-0"><i class="bi bi-info-circle"></i> @hint</p>
+    }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,17 @@
+@model EmployeeRow
+@if (!Model.Employee.IsActive)
+{
+    <span class="badge text-bg-secondary">已離職</span>
+}
+else if (Model.IsLocked)
+{
+    <span class="badge text-bg-danger"><i class="bi bi-lock-fill"></i> 鎖定</span>
+}
+else if (Model.Employee.MustChangePassword)
+{
+    <span class="badge text-bg-warning">待改密碼</span>
+}
+else
+{
+    <span class="badge text-bg-success">在職</span>
+}

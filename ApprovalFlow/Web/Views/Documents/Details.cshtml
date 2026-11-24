@@ -1,0 +1,332 @@
+@model DocumentDetailsViewModel
+@{
+    var d = Model.Document;
+    var p = Model.Permissions;
+    ViewData["Title"] = string.IsNullOrEmpty(d.DocumentNo) ? d.Title : d.DocumentNo;
+    var current = d.GetCurrentStep();
+    string ActionIcon(ApprovalActionType a) => a switch
+    {
+        ApprovalActionType.Submit or ApprovalActionType.Resubmit => "bi-send",
+        ApprovalActionType.Approve => "bi-check-lg",
+        ApprovalActionType.Reject => "bi-x-lg",
+        ApprovalActionType.ReturnToPrevious or ApprovalActionType.ReturnToApplicant => "bi-arrow-return-left",
+        ApprovalActionType.Withdraw => "bi-arrow-counterclockwise",
+        ApprovalActionType.AddSigner => "bi-person-plus",
+        ApprovalActionType.Transfer => "bi-arrow-left-right",
+        ApprovalActionType.Escalate => "bi-arrow-up-circle",
+        ApprovalActionType.Remind => "bi-alarm",
+        _ => "bi-chat-left-text"
+    };
+    string ActionColor(ApprovalActionType a) => a switch
+    {
+        ApprovalActionType.Approve => "success",
+        ApprovalActionType.Reject => "danger",
+        ApprovalActionType.ReturnToPrevious or ApprovalActionType.ReturnToApplicant or ApprovalActionType.Remind or ApprovalActionType.Escalate => "warning",
+        ApprovalActionType.Submit or ApprovalActionType.Resubmit => "primary",
+        _ => "secondary"
+    };
+    string StepClass(DocumentStep s) => s.Status switch
+    {
+        StepStatus.Active => "is-active",
+        StepStatus.Approved => "is-done",
+        StepStatus.Rejected or StepStatus.Returned => "is-stopped",
+        StepStatus.Skipped or StepStatus.Cancelled => "is-skipped",
+        _ => ""
+    };
+    string DecisionBadge(AssigneeDecision x) => x switch
+    {
+        AssigneeDecision.Approved => "text-bg-success",
+        AssigneeDecision.Rejected => "text-bg-danger",
+        AssigneeDecision.Returned => "text-bg-warning",
+        AssigneeDecision.Pending => "text-bg-primary",
+        _ => "text-bg-light border"
+    };
+    var onBehalf = p.OnBehalfOfId is int ob ? Model.Name(ob) : null;
+    // 手機版固定底部動作列：只有在可簽核 / 送出 / 撤回時才顯示
+    if (!p.HasAnyAction) ViewData["HideStickyActions"] = true;
+    ViewData["StickyActionsMobileOnly"] = true;
+}
+<div class="page-header">
+    <div class="min-w-0">
+        <div class="small text-body-secondary mb-1">
+            <i class="bi bi-file-earmark-text"></i> @d.DocumentType.ToDisplay()
+            @if (!string.IsNullOrEmpty(d.DocumentNo)) { <span>・@d.DocumentNo</span> }
+            @if (d.RevisionNo > 1) { <span class="badge text-bg-light border ms-1">第 @d.RevisionNo 次送出</span> }
+        </div>
+        <h1 class="page-title text-break">
+            @if (d.IsUrgent) { <span class="badge text-bg-danger align-middle me-1">急件</span> }
+            @d.Title
+        </h1>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        @if (Model.CanEdit)
+        {
+            <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@d.Id"><i class="bi bi-pencil me-1"></i>@(d.Status == DocumentStatus.Draft ? "編輯草稿" : "修改內容")</a>
+        }
+        <span class="badge fs-6 @d.Status.ToBadgeClass()">@d.Status.ToDisplay()</span>
+    </div>
+</div>
+
+@if (onBehalf != null)
+{
+    <div class="alert alert-info small"><i class="bi bi-person-badge me-1"></i>您目前以 <strong>@onBehalf</strong> 的代理人身分處理此單據，簽核紀錄會註明「代理」。</div>
+}
+
+<div class="row g-3">
+    <div class="col-lg-8 d-flex flex-column gap-3">
+        <div class="card">
+            <div class="card-header fw-semibold"><i class="bi bi-info-circle me-2"></i>單據資訊</div>
+            <div class="card-body">
+                <dl class="row mb-0 dl-compact">
+                    <dt class="col-4 col-sm-3">申請人</dt><dd class="col-8 col-sm-9">@Model.ApplicantName・@Model.DepartmentName</dd>
+                    <dt class="col-4 col-sm-3">送出時間</dt><dd class="col-8 col-sm-9">@(d.SubmittedAt?.ToString("yyyy/MM/dd HH:mm") ?? "尚未送出")</dd>
+                    @if (d.CompletedAt is { } done) { <dt class="col-4 col-sm-3">結案時間</dt><dd class="col-8 col-sm-9">@done.ToString("yyyy/MM/dd HH:mm")</dd> }
+                    <dt class="col-4 col-sm-3">簽核流程</dt><dd class="col-8 col-sm-9">@(Model.TemplateName ?? "送出時依當時啟用的流程版本決定")</dd>
+                    @if (d.CcEmployeeIds.Count > 0) { <dt class="col-4 col-sm-3">抄送</dt><dd class="col-8 col-sm-9">@string.Join("、", d.CcEmployeeIds.Select(i => Model.Name(i)))</dd> }
+                    @if (!string.IsNullOrEmpty(d.Content.Remark)) { <dt class="col-4 col-sm-3">備註</dt><dd class="col-8 col-sm-9 text-pre">@d.Content.Remark</dd> }
+                </dl>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header fw-semibold"><i class="bi bi-file-text me-2"></i>@d.DocumentType.ToDisplay()內容</div>
+            <div class="card-body">
+                <partial name="_Content" model="@(new DocumentContentModel(d, Model.Lookups))" />
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header fw-semibold"><i class="bi bi-paperclip me-2"></i>附件（@Model.Attachments.Count）</div>
+            @if (Model.Attachments.Count == 0)
+            {
+                <div class="card-body small text-body-secondary">沒有附件。</div>
+            }
+            else
+            {
+                <ul class="list-group list-group-flush small">
+                    @foreach (var a in Model.Attachments)
+                    {
+                        <li class="list-group-item d-flex align-items-center gap-2">
+                            <i class="bi @(a.ContentType.StartsWith("image/") ? "bi-file-earmark-image" : a.ContentType == "application/pdf" ? "bi-file-earmark-pdf" : "bi-file-earmark") fs-5 text-body-secondary"></i>
+                            <div class="min-w-0 flex-grow-1">
+                                <a class="text-break" asp-action="Attachment" asp-route-id="@a.Id"><i class="bi bi-download me-1"></i>@a.FileName</a>
+                                <div class="text-body-secondary">@FileSize.Format(a.SizeBytes)・@Model.Name(a.UploadedById)・@a.UploadedAt.ToString("yyyy/MM/dd HH:mm")</div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <div class="card">
+            <div class="card-header fw-semibold"><i class="bi bi-diagram-2 me-2"></i>簽核流程</div>
+            <div class="card-body">
+                @if (d.Steps.Count == 0)
+                {
+                    <p class="text-body-secondary small mb-0">單據送出後會依流程範本展開簽核關卡。</p>
+                }
+                else
+                {
+                    <ol class="flow-steps">
+                        @foreach (var s in d.Steps)
+                        {
+                            var overdue = s.Status == StepStatus.Active && s.DueAt is { } due && due < Model.Now;
+                            <li class="flow-step @StepClass(s) @(overdue ? "is-overdue" : "")" aria-current="@(s.Status == StepStatus.Active ? "step" : null)">
+                                <div class="flow-step-dot">
+                                    @if (s.Status == StepStatus.Approved) { <i class="bi bi-check-lg"></i> }
+                                    else if (s.Status is StepStatus.Rejected) { <i class="bi bi-x-lg"></i> }
+                                    else if (s.Status is StepStatus.Returned) { <i class="bi bi-arrow-return-left"></i> }
+                                    else { <span>@s.StepNo</span> }
+                                </div>
+                                <div class="flow-step-body">
+                                    <div class="d-flex flex-wrap align-items-center gap-2">
+                                        <span class="fw-semibold">@s.Name</span>
+                                        @if (s.Assignees.Count > 1) { <span class="badge text-bg-light border">@s.Mode.ToDisplay()</span> }
+                                        @if (s.IsAddedStep) { <span class="badge text-bg-info">加簽</span> }
+                                        @if (s.IsEscalated) { <span class="badge text-bg-warning">已升級</span> }
+                                        <span class="small text-body-secondary">@s.Status.ToDisplay()</span>
+                                    </div>
+                                    @if (s.Status == StepStatus.Skipped)
+                                    {
+                                        <div class="small text-body-secondary">@s.SkipReason</div>
+                                    }
+                                    else
+                                    {
+                                        <ul class="list-unstyled small mb-0 mt-1">
+                                            @foreach (var a in s.Assignees)
+                                            {
+                                                <li class="mb-1">
+                                                    @if (a.Decision == AssigneeDecision.Pending && s.Status != StepStatus.Active) { <span class="badge text-bg-light border">尚未輪到</span> } else { <span class="badge @DecisionBadge(a.Decision)">@a.Decision.ToDisplay()</span> }
+                                                    <span class="ms-1">@Model.Name(a.EmployeeId)</span>
+                                                    @if (a.IsDelegated()) { <span class="text-body-secondary">（由 @Model.Name(a.ActedById) 代理）</span> }
+                                                    @if (a.Source == AssigneeSource.Transferred) { <span class="text-body-secondary">（轉簽自 @Model.Name(a.AssignedById)）</span> }
+                                                    @if (a.Source == AssigneeSource.Escalated) { <span class="text-body-secondary">（逾時升級）</span> }
+                                                    @if (a.DecidedAt is { } at) { <span class="text-body-secondary ms-1">@at.ToString("MM/dd HH:mm")</span> }
+                                                    @if (!string.IsNullOrEmpty(a.Comment)) { <div class="text-body-secondary ps-1">「@a.Comment」</div> }
+                                                </li>
+                                            }
+                                        </ul>
+                                        @if (s.Status == StepStatus.Active && s.DueAt is { } dueAt)
+                                        {
+                                            <div class="small @(overdue ? "text-danger fw-semibold" : "text-body-secondary")">
+                                                <i class="bi bi-stopwatch"></i> 時效 @s.SlaHours 工作小時，@(overdue ? "已於" : "請於") @dueAt.ToString("MM/dd HH:mm") @(overdue ? "逾時" : "前完成")
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </li>
+                        }
+                    </ol>
+                }
+            </div>
+        </div>
+
+        @{ var comments = d.History.Where(h => h.Action == ApprovalActionType.Comment || (!string.IsNullOrEmpty(h.Comment) && h.Action != ApprovalActionType.Remind)).OrderBy(h => h.Seq).ToList(); }
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-semibold"><i class="bi bi-chat-left-text me-2"></i>意見與留言（@comments.Count）</span>
+                @if (p.CanComment)
+                {
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modal-comment"><i class="bi bi-plus-lg me-1"></i>留言</button>
+                }
+            </div>
+            @if (comments.Count == 0)
+            {
+                <div class="card-body small text-body-secondary">尚無意見。</div>
+            }
+            else
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var h in comments)
+                    {
+                        var mine = h.ActorId == Model.CurrentUserId;
+                        <li class="list-group-item comment-item @(mine ? "is-mine" : "")">
+                            <div class="d-flex justify-content-between small">
+                                <span>
+                                    <span class="fw-semibold">@Model.Name(h.ActorId)</span>
+                                    @if (h.OnBehalfOfId is int cob) { <span class="text-body-secondary">（代理 @Model.Name(cob)）</span> }
+                                    @if (h.Action != ApprovalActionType.Comment) { <span class="badge text-bg-light border ms-1">@h.Action.ToDisplay()</span> }
+                                </span>
+                                <span class="text-body-secondary">@h.At.ToString("MM/dd HH:mm")</span>
+                            </div>
+                            <div class="text-pre mt-1">@h.Comment</div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        @if (d.Revisions.Count > 1)
+        {
+            <div class="card">
+                <div class="card-header fw-semibold"><i class="bi bi-layers me-2"></i>送出版本紀錄</div>
+                <ul class="list-group list-group-flush small">
+                    @foreach (var r in d.Revisions.OrderByDescending(r => r.RevisionNo))
+                    {
+                        var prev = d.Revisions.FirstOrDefault(x => x.RevisionNo == r.RevisionNo - 1);
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <span class="fw-semibold">第 @r.RevisionNo 版</span>
+                                <span class="text-body-secondary">@r.SubmittedAt.ToString("yyyy/MM/dd HH:mm")</span>
+                            </div>
+                            <div>@r.Title</div>
+                            @if (prev != null)
+                            {
+                                <div class="text-body-secondary">
+                                    @if (prev.Title != r.Title) { <div>主旨：@prev.Title → @r.Title</div> }
+                                    @if (prev.Amount != r.Amount) { <div>金額：@prev.Amount?.ToString("N0") → @r.Amount?.ToString("N0")</div> }
+                                    @if (prev.Hours != r.Hours) { <div>時數：@prev.Hours?.ToString("0.#") → @r.Hours?.ToString("0.#")</div> }
+                                    @if (prev.Content.Remark != r.Content.Remark) { <div>備註已修改</div> }
+                                </div>
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+
+    <div class="col-lg-4 d-flex flex-column gap-3">
+        @if (p.HasAnyAction || p.CanComment)
+        {
+            <div class="card d-none d-lg-block">
+                <div class="card-header fw-semibold"><i class="bi bi-pen me-2"></i>處理</div>
+                <div class="card-body d-grid gap-2">
+                    <partial name="_ActionButtons" model="Model" />
+                </div>
+            </div>
+        }
+        @if (!p.CanWithdraw && p.WithdrawBlockedReason != null)
+        {
+            <div class="alert alert-light border small mb-0"><i class="bi bi-lock me-1"></i>@p.WithdrawBlockedReason</div>
+        }
+
+        <div class="card">
+            <div class="card-header fw-semibold"><i class="bi bi-clock-history me-2"></i>歷程（@d.History.Count）</div>
+            @if (d.History.Count == 0)
+            {
+                <div class="card-body small text-body-secondary">尚無紀錄。</div>
+            }
+            else
+            {
+                <ul class="timeline">
+                    @foreach (var h in d.History.OrderByDescending(h => h.Seq))
+                    {
+                        <li class="timeline-item">
+                            <span class="timeline-icon bg-@ActionColor(h.Action)-subtle text-@ActionColor(h.Action)-emphasis"><i class="bi @ActionIcon(h.Action)"></i></span>
+                            <div class="small">
+                                <div>
+                                    <span class="fw-semibold">@Model.Name(h.ActorId)</span>
+                                    @if (h.OnBehalfOfId is int ob2) { <span class="text-body-secondary">（代理 @Model.Name(ob2)）</span> }
+                                    <span>@h.Action.ToDisplay()</span>
+                                    @if (h.TargetEmployeeId is int t) { <span>→ @Model.Name(t)</span> }
+                                </div>
+                                <div class="text-body-secondary">
+                                    @h.At.ToString("yyyy/MM/dd HH:mm")
+                                    @if (!string.IsNullOrEmpty(h.StepName)) { <span>・@h.StepName</span> }
+                                    @if (h.ToStatus is { } ts) { <span>・<span class="badge @ts.ToBadgeClass()">@ts.ToDisplay()</span></span> }
+                                </div>
+                                @if (!string.IsNullOrEmpty(h.Comment)) { <div class="timeline-comment">@h.Comment</div> }
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>
+
+@section StickyActions {
+    <div class="d-lg-none sticky-action-row">
+        <partial name="_ActionButtons" model="Model" />
+    </div>
+}
+
+@* 動作確認視窗 *@
+@if (p.CanSubmit)
+{
+    <partial name="_ActionModal" model="@(new ActionModalModel("submit", d.Status == DocumentStatus.Draft ? "送出單據" : "重新送出", "確認送出", "btn-primary", "bi-send", false, false, d.Status == DocumentStatus.Draft ? "送出後會依目前啟用的流程版本展開簽核關卡。" : "重新送出會沿用原本的流程版本，並保留這次的內容版本。", Model))" />
+}
+@if (p.CanApprove)
+{
+    <partial name="_ActionModal" model="@(new ActionModalModel("approve", "核准", "核准", "btn-success", "bi-check-lg", false, false, null, Model))" />
+    <partial name="_ActionModal" model="@(new ActionModalModel("reject", "駁回", "確認駁回", "btn-danger", "bi-x-lg", true, false, "駁回後流程結束，申請人需重新申請。", Model))" />
+    <partial name="_ActionModal" model="@(new ActionModalModel("returnApplicant", "退回申請人", "確認退回", "btn-warning", "bi-arrow-return-left", true, false, "申請人修改後可重新送出，流程會從頭開始。", Model))" />
+    <partial name="_ActionModal" model="@(new ActionModalModel("transfer", "轉簽", "確認轉簽", "btn-primary", "bi-arrow-left-right", true, true, "由對方代替您完成本關簽核。", Model))" />
+}
+@if (p.CanReturnToPrevious)
+{
+    <partial name="_ActionModal" model="@(new ActionModalModel("returnPrevious", "退回上一關", "確認退回", "btn-warning", "bi-arrow-90deg-up", true, false, "上一關的簽核人需重新簽核。", Model))" />
+}
+@if (p.CanAddSigner)
+{
+    <partial name="_ActionModal" model="@(new ActionModalModel("addSigner", "加簽", "確認加簽", "btn-primary", "bi-person-plus", true, true, "在本關之後加入一位簽核人；您仍需完成本關簽核。", Model))" />
+}
+@if (p.CanWithdraw)
+{
+    <partial name="_ActionModal" model="@(new ActionModalModel("withdraw", "撤回單據", "確認撤回", "btn-outline-danger", "bi-arrow-counterclockwise", false, false, "撤回後可修改再重新送出。", Model))" />
+}
+@if (p.CanComment)
+{
+    <partial name="_ActionModal" model="@(new ActionModalModel("comment", "留言", "送出留言", "btn-primary", "bi-chat-left-text", true, false, null, Model))" />
+}

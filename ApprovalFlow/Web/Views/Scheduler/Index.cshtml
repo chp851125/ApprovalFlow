@@ -1,0 +1,58 @@
+@model SchedulerIndexViewModel
+@{
+    ViewData["Title"] = "排程與通知";
+    var s = Model.Status;
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">排程與通知</h1>
+        <div class="text-body-secondary small">背景排程定期檢查簽核時效（提醒、逾時、自動升級）並寄送每日待辦摘要。參數可在「系統參數」調整，每個關卡的時效在「簽核流程」設定。</div>
+    </div>
+    <a class="btn btn-outline-secondary" asp-action="Emails"><i class="bi bi-envelope me-1"></i>Email 寄送紀錄</a>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header fw-semibold d-flex justify-content-between">
+                <span><i class="bi bi-cpu me-2"></i>背景排程狀態</span>
+                @if (s.Enabled) { <span class="badge text-bg-success">執行中</span> } else { <span class="badge text-bg-secondary">已停用</span> }
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0 dl-compact">
+                    <dt class="col-5">檢查間隔</dt><dd class="col-7">每 @s.IntervalSeconds 秒</dd>
+                    <dt class="col-5">啟動時間</dt><dd class="col-7">@(s.StartedAt?.ToString("yyyy/MM/dd HH:mm:ss") ?? "—")</dd>
+                    <dt class="col-5">上次執行</dt><dd class="col-7">@(s.LastRunAt?.ToString("yyyy/MM/dd HH:mm:ss") ?? "尚未執行")（累計 @s.RunCount 次）</dd>
+                    <dt class="col-5">下次執行</dt><dd class="col-7">@(s.NextRunAt?.ToString("HH:mm:ss") ?? "—")</dd>
+                    <dt class="col-5">時效檢查結果</dt><dd class="col-7">@(s.LastSlaResult ?? "—")</dd>
+                    <dt class="col-5">每日摘要結果</dt><dd class="col-7">@(s.LastDigestResult ?? "—")</dd>
+                    @if (s.LastError != null)
+                    {
+                        <dt class="col-5 text-danger">最近錯誤</dt><dd class="col-7 text-danger">@s.LastErrorAt?.ToString("MM/dd HH:mm") @s.LastError</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header fw-semibold"><i class="bi bi-sliders me-2"></i>目前規則</div>
+            <div class="card-body">
+                <ul class="small mb-3 ps-3">
+                    <li>關卡未設定時效時，預設 <strong>@Model.DefaultSlaHours</strong> 個工作小時（09:00–12:00、13:00–18:00，不含假日）。</li>
+                    <li>到期前 <strong>@Model.ReminderBeforeHours</strong> 個工作小時提醒簽核人（每關一次）。</li>
+                    <li>超過期限：單據改為「逾時」並通知簽核人。</li>
+                    <li>自動升級：@(Model.AutoEscalate ? $"逾時 {Model.EscalateAfterHours} 個工作小時後升級給簽核人的上一層主管，並重新計算期限（每關一次）" : "未啟用")。</li>
+                    <li>每日摘要：@(Model.DigestEnabled ? $"工作日 {Model.DigestHour}:00 後，寄給有待辦的人（每天一次）" : "未啟用")。</li>
+                    <li>Email：@(Model.EmailEnabled ? "啟用（寫入 outbox 資料夾的 .eml 檔）" : "未啟用（只發站內通知）")，累計 @Model.EmailTotal 封@(Model.EmailFailed > 0 ? $"，失敗 {Model.EmailFailed} 封" : "")。</li>
+                </ul>
+                <div class="d-flex flex-wrap gap-2">
+                    <form method="post" asp-action="RunNow"><input type="hidden" name="job" value="sla" /><button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-stopwatch me-1"></i>立即執行時效檢查</button></form>
+                    <form method="post" asp-action="RunNow"><input type="hidden" name="job" value="digest" /><button type="submit" class="btn btn-outline-primary btn-sm"><i class="bi bi-calendar-check me-1"></i>立即寄送每日摘要</button></form>
+                    <a class="btn btn-outline-secondary btn-sm" asp-controller="Settings" asp-action="Index"><i class="bi bi-gear me-1"></i>調整參數</a>
+                </div>
+                <div class="form-text">手動寄送每日摘要不受時刻與工作日限制，但同一人當天仍只會收到一次。</div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,62 @@
+[
+  {
+    "code": "6111",
+    "name": "旅費",
+    "year": 2026,
+    "annualBudget": 600000,
+    "ownerDepartmentId": 4,
+    "isActive": true,
+    "id": 1,
+    "version": 1
+  },
+  {
+    "code": "6112",
+    "name": "交際費",
+    "year": 2026,
+    "annualBudget": 360000,
+    "ownerDepartmentId": 1,
+    "isActive": true,
+    "id": 2,
+    "version": 1
+  },
+  {
+    "code": "6113",
+    "name": "文具印刷費",
+    "year": 2026,
+    "annualBudget": 120000,
+    "ownerDepartmentId": 2,
+    "isActive": true,
+    "id": 3,
+    "version": 1
+  },
+  {
+    "code": "6114",
+    "name": "郵電費",
+    "year": 2026,
+    "annualBudget": 150000,
+    "ownerDepartmentId": 2,
+    "isActive": true,
+    "id": 4,
+    "version": 1
+  },
+  {
+    "code": "6115",
+    "name": "職工訓練費",
+    "year": 2026,
+    "annualBudget": 200000,
+    "ownerDepartmentId": 2,
+    "isActive": true,
+    "id": 5,
+    "version": 1
+  },
+  {
+    "code": "6116",
+    "name": "設備及雜項購置",
+    "year": 2026,
+    "annualBudget": 1200000,
+    "ownerDepartmentId": 2,
+    "isActive": true,
+    "id": 6,
+    "version": 1
+  }
+]

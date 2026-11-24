@@ -1,0 +1,54 @@
+[
+  {
+    "principalId": 9,
+    "delegateId": 10,
+    "startDate": "2026-03-02",
+    "endDate": "2026-03-06",
+    "documentTypes": [],
+    "reason": "參加會計師公會 IFRS 進修課程",
+    "isEnabled": true,
+    "createdById": 9,
+    "createdAt": "2026-02-24T17:09:00+08:00",
+    "id": 1,
+    "version": 1
+  },
+  {
+    "principalId": 13,
+    "delegateId": 14,
+    "startDate": "2026-07-13",
+    "endDate": "2026-07-24",
+    "documentTypes": [],
+    "reason": "特休出國",
+    "isEnabled": true,
+    "createdById": 13,
+    "createdAt": "2026-07-09T12:36:00+08:00",
+    "id": 2,
+    "version": 1
+  },
+  {
+    "principalId": 15,
+    "delegateId": 14,
+    "startDate": "2026-11-20",
+    "endDate": "2026-11-27",
+    "documentTypes": [],
+    "reason": "南部客戶巡迴拜訪出差",
+    "isEnabled": true,
+    "createdById": 15,
+    "createdAt": "2026-11-18T15:37:00+08:00",
+    "id": 3,
+    "version": 1
+  },
+  {
+    "principalId": 3,
+    "delegateId": 4,
+    "startDate": "2026-12-03",
+    "endDate": "2026-12-07",
+    "documentTypes": [],
+    "reason": "年度特休",
+    "isEnabled": true,
+    "createdById": 3,
+    "createdAt": "2026-11-20T13:21:00+08:00",
+    "id": 4,
+    "version": 1
+  }
+]

@@ -1,0 +1,75 @@
+@model DelegationCreateViewModel
+@{
+    ViewData["Title"] = "新增代理";
+}
+<div class="page-header">
+    <div>
+        <nav aria-label="breadcrumb"><ol class="breadcrumb small mb-1"><li class="breadcrumb-item"><a asp-action="Index">代理人設定</a></li><li class="breadcrumb-item active">新增代理</li></ol></nav>
+        <h1 class="page-title">新增代理</h1>
+    </div>
+</div>
+
+<div class="card form-card">
+    <div class="card-body">
+        <form method="post" asp-action="Create" novalidate>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger small" role="alert"></div>
+            <div class="row g-3">
+                @if (Model.CanManageAll)
+                {
+                    <div class="col-sm-6">
+                        <label asp-for="Input.PrincipalId" class="form-label required"></label>
+                        <select asp-for="Input.PrincipalId" asp-items="Model.Principals" class="form-select"></select>
+                        <div class="form-text">人資與系統管理員可替他人設定代理。</div>
+                        <span asp-validation-for="Input.PrincipalId" class="invalid-feedback d-block"></span>
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" asp-for="Input.PrincipalId" />
+                }
+                <div class="col-sm-6">
+                    <label asp-for="Input.DelegateId" class="form-label required"></label>
+                    <select asp-for="Input.DelegateId" asp-items="Model.Delegates" class="form-select">
+                        <option value="0">請選擇</option>
+                    </select>
+                    <span asp-validation-for="Input.DelegateId" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-6 col-sm-3">
+                    <label asp-for="Input.StartDate" class="form-label required"></label>
+                    <input asp-for="Input.StartDate" type="date" class="form-control" />
+                    <span asp-validation-for="Input.StartDate" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-6 col-sm-3">
+                    <label asp-for="Input.EndDate" class="form-label required"></label>
+                    <input asp-for="Input.EndDate" type="date" class="form-control" />
+                    <span asp-validation-for="Input.EndDate" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">適用單別 <span class="small text-body-secondary">（都不勾選代表全部單別）</span></label>
+                    <div class="d-flex flex-wrap gap-3">
+                        @foreach (var t in Enum.GetValues<DocumentType>())
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="Input.DocumentTypes" value="@t" id="dt_@t" checked="@Model.Input.DocumentTypes.Contains(t)" />
+                                <label class="form-check-label" for="dt_@t">@t.ToDisplay()</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Input.Reason" class="form-label required"></label>
+                    <input asp-for="Input.Reason" class="form-control" maxlength="100" placeholder="例：特休、出差至高雄" />
+                    <span asp-validation-for="Input.Reason" class="invalid-feedback d-block"></span>
+                </div>
+            </div>
+            <div class="alert alert-light border small mt-3 mb-0">
+                <i class="bi bi-info-circle me-1"></i>
+                單次最長 @Model.MaxDays 天；同一期間同一單別只能有一位代理人；代理人本身若在該期間也設定了代理，則無法指定（避免連鎖代理）。
+            </div>
+            <div class="form-actions">
+                <a asp-action="Index" class="btn btn-outline-secondary">取消</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>建立代理</button>
+            </div>
+        </form>
+    </div>
+</div>

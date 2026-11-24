@@ -1,0 +1,44 @@
+@model HolidayEditViewModel
+@{
+    ViewData["Title"] = "編輯特殊日";
+}
+<div class="page-header">
+    <div>
+        <nav aria-label="breadcrumb"><ol class="breadcrumb small mb-1"><li class="breadcrumb-item"><a asp-action="Index" asp-route-year="@Model.Input.Date?.Year">假日行事曆</a></li><li class="breadcrumb-item active">編輯</li></ol></nav>
+        <h1 class="page-title">編輯特殊日</h1>
+    </div>
+</div>
+
+<div class="card form-card">
+    <div class="card-body">
+        <form method="post" asp-action="Edit" novalidate>
+            <input type="hidden" asp-for="Input.Id" />
+            <input type="hidden" asp-for="Input.Version" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger small" role="alert"></div>
+            <div class="row g-3">
+                <div class="col-sm-4">
+                    <label asp-for="Input.Date" class="form-label required"></label>
+                    <input asp-for="Input.Date" type="date" class="form-control" />
+                    <span asp-validation-for="Input.Date" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-sm-5">
+                    <label asp-for="Input.Name" class="form-label required"></label>
+                    <input asp-for="Input.Name" class="form-control" maxlength="30" />
+                    <span asp-validation-for="Input.Name" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-sm-3">
+                    <label asp-for="Input.Type" class="form-label"></label>
+                    <select asp-for="Input.Type" class="form-select">
+                        <option value="@HolidayType.Holiday">@HolidayType.Holiday.ToDisplay()</option>
+                        <option value="@HolidayType.MakeupWorkday">@HolidayType.MakeupWorkday.ToDisplay()</option>
+                    </select>
+                    <span asp-validation-for="Input.Type" class="invalid-feedback d-block"></span>
+                </div>
+            </div>
+            <div class="form-actions">
+                <a asp-action="Index" asp-route-year="@Model.Input.Date?.Year" class="btn btn-outline-secondary">取消</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>儲存</button>
+            </div>
+        </form>
+    </div>
+</div>

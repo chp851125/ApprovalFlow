@@ -1,0 +1,39 @@
+@model List<DocumentTypeOption>
+@{
+    ViewData["Title"] = "新增申請";
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">新增申請</h1>
+        <div class="text-body-secondary small">請選擇要申請的單別。填寫中途可先儲存草稿，之後到「草稿」繼續編輯。</div>
+    </div>
+</div>
+
+<div class="row g-3">
+    @foreach (var o in Model)
+    {
+        var c = o.Config;
+        <div class="col-sm-6 col-xl-3">
+            @if (o.HasActiveTemplate)
+            {
+                <a class="card card-hover h-100 text-decoration-none text-body type-card" asp-action="Create" asp-route-type="@c.DocumentType">
+                    <div class="card-body">
+                        <div class="type-card-icon"><i class="bi @(c.Icon ?? "bi-file-earmark-text")"></i></div>
+                        <div class="fw-semibold fs-5">@c.Name</div>
+                        <div class="small text-body-secondary">@c.Description</div>
+                    </div>
+                </a>
+            }
+            else
+            {
+                <div class="card h-100 opacity-50">
+                    <div class="card-body">
+                        <div class="type-card-icon"><i class="bi @(c.Icon ?? "bi-file-earmark-text")"></i></div>
+                        <div class="fw-semibold fs-5">@c.Name</div>
+                        <div class="small text-danger">尚未設定簽核流程，暫停申請</div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

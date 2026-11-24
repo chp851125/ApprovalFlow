@@ -1,0 +1,54 @@
+[
+  {
+    "documentType": "Leave",
+    "name": "請假單",
+    "prefix": "LV",
+    "numberFormat": "{prefix}-{yyyyMM}-{seq:0000}",
+    "resetPeriod": "Monthly",
+    "allowBatchApprove": true,
+    "isEnabled": true,
+    "icon": "bi-calendar2-week",
+    "description": "各類假別申請，送出時檢查假別餘額",
+    "id": 1,
+    "version": 1
+  },
+  {
+    "documentType": "Expense",
+    "name": "費用報銷單",
+    "prefix": "EX",
+    "numberFormat": "{prefix}-{yyyyMM}-{seq:0000}",
+    "resetPeriod": "Monthly",
+    "allowBatchApprove": false,
+    "isEnabled": true,
+    "icon": "bi-receipt",
+    "description": "差旅、交際、雜支等費用報銷",
+    "id": 2,
+    "version": 1
+  },
+  {
+    "documentType": "Purchase",
+    "name": "採購申請單",
+    "prefix": "PR",
+    "numberFormat": "{prefix}-{yyyyMM}-{seq:0000}",
+    "resetPeriod": "Monthly",
+    "allowBatchApprove": false,
+    "isEnabled": true,
+    "icon": "bi-cart3",
+    "description": "設備、耗材與服務採購",
+    "id": 3,
+    "version": 1
+  },
+  {
+    "documentType": "Overtime",
+    "name": "加班申請單",
+    "prefix": "OT",
+    "numberFormat": "{prefix}-{yyyyMM}-{seq:0000}",
+    "resetPeriod": "Monthly",
+    "allowBatchApprove": true,
+    "isEnabled": true,
+    "icon": "bi-clock-history",
+    "description": "平日或假日加班事前 / 事後申請",
+    "id": 4,
+    "version": 1
+  }
+]

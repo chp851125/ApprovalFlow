@@ -1,0 +1,84 @@
+@model DelegationIndexViewModel
+@{
+    ViewData["Title"] = "代理人設定";
+    var tabs = new List<(string Key, string Label, string Icon)> { ("mine", "我的代理人", "bi-person-up"), ("acting", "我代理的人", "bi-person-down") };
+    if (Model.CanManageAll) tabs.Add(("all", "全公司", "bi-buildings"));
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">代理人設定</h1>
+        <div class="text-body-secondary small">休假或出差時，可指定代理人在期間內代為簽核。代理簽核的紀錄會註明代理人與被代理人。</div>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg me-1"></i>新增代理</a>
+</div>
+
+@if (Model.ActingNow.Count > 0)
+{
+    <div class="alert alert-info d-flex gap-2">
+        <i class="bi bi-person-badge fs-5"></i>
+        <div>
+            您目前正在代理：
+            @string.Join("、", Model.ActingNow.Select(r => $"{r.PrincipalName}（至 {r.Delegation.EndDate:MM/dd}）"))。
+            代理期間對方的待簽單據會出現在您的待辦中。
+        </div>
+    </div>
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <ul class="nav nav-pills">
+        @foreach (var t in tabs)
+        {
+            <li class="nav-item"><a class="nav-link @(Model.Scope == t.Key ? "active" : "")" asp-action="Index" asp-route-scope="@t.Key" asp-route-expired="@Model.IncludeExpired"><i class="bi @t.Icon me-1"></i>@t.Label</a></li>
+        }
+    </ul>
+    <a class="small" asp-action="Index" asp-route-scope="@Model.Scope" asp-route-expired="@(!Model.IncludeExpired)">
+        <i class="bi @(Model.IncludeExpired ? "bi-eye-slash" : "bi-clock-history") me-1"></i>@(Model.IncludeExpired ? "隱藏已結束 / 已取消" : "顯示已結束 / 已取消")
+    </a>
+</div>
+
+@if (Model.Rows.Count == 0)
+{
+    <div class="card"><div class="card-body empty-state py-5">
+        <div class="empty-state-icon"><i class="bi bi-person-check"></i></div>
+        <p class="text-body-secondary mb-3">目前沒有代理設定</p>
+        <a class="btn btn-outline-primary btn-sm" asp-action="Create">新增代理</a>
+    </div></div>
+}
+else
+{
+    <div class="vstack gap-2">
+        @foreach (var r in Model.Rows)
+        {
+            var d = r.Delegation;
+            <div class="card">
+                <div class="card-body py-3">
+                    <div class="d-flex flex-wrap justify-content-between gap-2">
+                        <div class="min-w-0">
+                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                <span class="fw-semibold">@r.PrincipalName</span>
+                                <i class="bi bi-arrow-right text-body-secondary"></i>
+                                <span class="fw-semibold">@r.DelegateName</span>
+                                <span class="badge @r.StatusBadge">@r.StatusText</span>
+                            </div>
+                            <div class="small text-body-secondary mt-1">
+                                <i class="bi bi-calendar-range"></i> @d.StartDate.ToString("yyyy/MM/dd")～@d.EndDate.ToString("yyyy/MM/dd")（@(d.EndDate.DayNumber - d.StartDate.DayNumber + 1) 天）
+                                <span class="mx-1">|</span><i class="bi bi-files"></i> @DelegationService.DescribeTypes(d.DocumentTypes)
+                            </div>
+                            <div class="small mt-1">@d.Reason</div>
+                            <div class="small text-body-secondary">由 @r.CreatedByName 於 @d.CreatedAt.ToString("yyyy/MM/dd HH:mm") 設定</div>
+                        </div>
+                        @if (r.CanCancel)
+                        {
+                            <form method="post" asp-action="Disable" class="align-self-center" data-confirm="確定要取消這筆代理設定嗎？">
+                                <input type="hidden" name="id" value="@d.Id" />
+                                <input type="hidden" name="version" value="@d.Version" />
+                                <input type="hidden" name="scope" value="@Model.Scope" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle me-1"></i>@(r.StatusText == "生效中" ? "提前結束" : "取消")</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

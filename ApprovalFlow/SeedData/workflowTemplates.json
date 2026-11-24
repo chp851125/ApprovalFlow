@@ -1,0 +1,279 @@
+[
+  {
+    "documentType": "Leave",
+    "name": "請假標準流程",
+    "templateVersion": 1,
+    "isActive": true,
+    "effectiveFrom": "2025-01-01",
+    "description": "直屬主管核准；超過 3 天加會部門主管；人資備查",
+    "steps": [
+      {
+        "stepNo": 1,
+        "name": "直屬主管核准",
+        "approverSource": "DirectManager",
+        "roleName": null,
+        "userIds": [],
+        "levels": 1,
+        "mode": "Single",
+        "condition": null,
+        "slaHours": 16,
+        "allowWithdraw": true
+      },
+      {
+        "stepNo": 2,
+        "name": "部門主管核准",
+        "approverSource": "DepartmentManager",
+        "roleName": null,
+        "userIds": [],
+        "levels": 1,
+        "mode": "Single",
+        "condition": {
+          "field": "Days",
+          "operator": "GreaterThan",
+          "value": 3
+        },
+        "slaHours": 16,
+        "allowWithdraw": true
+      },
+      {
+        "stepNo": 3,
+        "name": "人資備查",
+        "approverSource": "Role",
+        "roleName": "HR",
+        "userIds": [],
+        "levels": 1,
+        "mode": "Any",
+        "condition": null,
+        "slaHours": 24,
+        "allowWithdraw": true
+      }
+    ],
+    "createdAt": "2025-12-15T10:00:00+08:00",
+    "createdById": 7,
+    "id": 1,
+    "version": 1
+  },
+  {
+    "documentType": "Expense",
+    "name": "費用報銷流程",
+    "templateVersion": 1,
+    "isActive": false,
+    "effectiveFrom": "2025-01-01",
+    "description": "（舊版）直屬主管核准後由財務審核",
+    "steps": [
+      {
+        "stepNo": 1,
+        "name": "直屬主管核准",
+        "approverSource": "DirectManager",
+        "roleName": null,
+        "userIds": [],
+        "levels": 1,
+        "mode": "Single",
+        "condition": null,
+        "slaHours": 16,
+        "allowWithdraw": true
+      },
+      {
+        "stepNo": 2,
+        "name": "財務審核",
+        "approverSource": "Role",
+        "roleName": "Finance",
+        "userIds": [],
+        "levels": 1,
+        "mode": "Any",
+        "condition": null,
+        "slaHours": 24,
+        "allowWithdraw": true
+      }
+    ],
+    "createdAt": "2025-12-15T10:00:00+08:00",
+    "createdById": 7,
+    "id": 2,
+    "version": 1
+  },
+  {
+    "documentType": "Expense",
+    "name": "費用報銷流程",
+    "templateVersion": 2,
+    "isActive": true,
+    "effectiveFrom": "2026-06-01",
+    "description": "2026/6 起：1 萬元以上加會部門主管，5 萬元以上需總經理核決",
+    "steps": [
+      {
+        "stepNo": 1,
+        "name": "直屬主管核准",
+        "approverSource": "DirectManager",
+        "roleName": null,
+        "userIds": [],
+        "levels": 1,
+        "mode": "Single",
+        "condition": null,
+        "slaHours": 16,
+        "allowWithdraw": true
+      },
+      {
+        "stepNo": 2,
+        "name": "部門主管核准",
+        "approverSource": "DepartmentManager",
+        "roleName": null,
+        "userIds": [],
+        "levels": 1,
+        "mode": "Single",
+        "condition": {
+          "field": "Amount",
+          "operator": "GreaterThanOrEqual",
+          "value": 10000
+        },
+        "slaHours": 16,
+        "allowWithdraw": true
+      },
+      {
+        "stepNo": 3,
+        "name": "財務審核",
+        "approverSource": "Role",
+        "roleName": "Finance",
+        "userIds": [],
+        "levels": 1,
+        "mode": "Any",
+        "condition": null,
+        "slaHours": 24,
+        "allowWithdraw": true
+      },
+      {
+        "stepNo": 4,
+        "name": "總經理核決",
+        "approverSource": "SpecificUser",
+        "roleName": null,
+        "userIds": [
+          1
+        ],
+        "levels": 1,
+        "mode": "Single",
+        "condition": {
+          "field": "Amount",
+          "operator": "GreaterThanOrEqual",
+          "value": 50000
+        },
+        "slaHours": 24,
+        "allowWithdraw": true
+      }
+    ],
+    "createdAt": "2026-05-25T14:20:00+08:00",
+    "createdById": 7,
+    "id": 3,
+    "version": 1
+  },
+  {
+    "documentType": "Purchase",
+    "name": "採購申請流程",
+    "templateVersion": 1,
+    "isActive": true,
+    "effectiveFrom": "2025-01-01",
+    "description": "3 萬元以上需上兩級主管；財務經理與會計會簽；10 萬元以上總經理核決",
+    "steps": [
+      {
+        "stepNo": 1,
+        "name": "直屬主管核准",
+        "approverSource": "DirectManager",
+        "roleName": null,
+        "userIds": [],
+        "levels": 1,
+        "mode": "Single",
+        "condition": null,
+        "slaHours": 16,
+        "allowWithdraw": true
+      },
+      {
+        "stepNo": 2,
+        "name": "上兩級主管核准",
+        "approverSource": "ManagerLevelN",
+        "roleName": null,
+        "userIds": [],
+        "levels": 2,
+        "mode": "Single",
+        "condition": {
+          "field": "Amount",
+          "operator": "GreaterThanOrEqual",
+          "value": 30000
+        },
+        "slaHours": 16,
+        "allowWithdraw": true
+      },
+      {
+        "stepNo": 3,
+        "name": "財務會簽",
+        "approverSource": "SpecificUser",
+        "roleName": null,
+        "userIds": [
+          9,
+          10
+        ],
+        "levels": 1,
+        "mode": "All",
+        "condition": null,
+        "slaHours": 24,
+        "allowWithdraw": true
+      },
+      {
+        "stepNo": 4,
+        "name": "總經理核決",
+        "approverSource": "SpecificUser",
+        "roleName": null,
+        "userIds": [
+          1
+        ],
+        "levels": 1,
+        "mode": "Single",
+        "condition": {
+          "field": "Amount",
+          "operator": "GreaterThanOrEqual",
+          "value": 100000
+        },
+        "slaHours": 24,
+        "allowWithdraw": true
+      }
+    ],
+    "createdAt": "2025-12-15T10:00:00+08:00",
+    "createdById": 7,
+    "id": 4,
+    "version": 1
+  },
+  {
+    "documentType": "Overtime",
+    "name": "加班申請流程",
+    "templateVersion": 1,
+    "isActive": true,
+    "effectiveFrom": "2025-01-01",
+    "description": "直屬主管核准後人資備查",
+    "steps": [
+      {
+        "stepNo": 1,
+        "name": "直屬主管核准",
+        "approverSource": "DirectManager",
+        "roleName": null,
+        "userIds": [],
+        "levels": 1,
+        "mode": "Single",
+        "condition": null,
+        "slaHours": 16,
+        "allowWithdraw": true
+      },
+      {
+        "stepNo": 2,
+        "name": "人資備查",
+        "approverSource": "Role",
+        "roleName": "HR",
+        "userIds": [],
+        "levels": 1,
+        "mode": "Any",
+        "condition": null,
+        "slaHours": 24,
+        "allowWithdraw": true
+      }
+    ],
+    "createdAt": "2025-12-15T10:00:00+08:00",
+    "createdById": 7,
+    "id": 5,
+    "version": 1
+  }
+]

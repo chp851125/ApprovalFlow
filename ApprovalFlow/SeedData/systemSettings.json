@@ -1,0 +1,191 @@
+[
+  {
+    "key": "Company.Name",
+    "value": "微積分科技股份有限公司",
+    "group": "一般",
+    "description": "公司名稱，顯示於頁首與 Email",
+    "valueType": "string",
+    "id": 1,
+    "version": 1
+  },
+  {
+    "key": "Site.BaseUrl",
+    "value": "https://localhost:7016",
+    "group": "一般",
+    "description": "系統網址，用於 Email 中的連結",
+    "valueType": "string",
+    "id": 2,
+    "version": 1
+  },
+  {
+    "key": "Password.MinLength",
+    "value": "8",
+    "group": "密碼原則",
+    "description": "密碼最短長度",
+    "valueType": "int",
+    "id": 3,
+    "version": 1
+  },
+  {
+    "key": "Password.RequireUppercase",
+    "value": "true",
+    "group": "密碼原則",
+    "description": "需包含大寫英文字母",
+    "valueType": "bool",
+    "id": 4,
+    "version": 1
+  },
+  {
+    "key": "Password.RequireLowercase",
+    "value": "true",
+    "group": "密碼原則",
+    "description": "需包含小寫英文字母",
+    "valueType": "bool",
+    "id": 5,
+    "version": 1
+  },
+  {
+    "key": "Password.RequireDigit",
+    "value": "true",
+    "group": "密碼原則",
+    "description": "需包含數字",
+    "valueType": "bool",
+    "id": 6,
+    "version": 1
+  },
+  {
+    "key": "Password.RequireSymbol",
+    "value": "false",
+    "group": "密碼原則",
+    "description": "需包含符號",
+    "valueType": "bool",
+    "id": 7,
+    "version": 1
+  },
+  {
+    "key": "Lockout.MaxFailedAttempts",
+    "value": "5",
+    "group": "登入安全",
+    "description": "連續登入失敗幾次後鎖定",
+    "valueType": "int",
+    "id": 8,
+    "version": 1
+  },
+  {
+    "key": "Lockout.Minutes",
+    "value": "15",
+    "group": "登入安全",
+    "description": "鎖定分鐘數",
+    "valueType": "int",
+    "id": 9,
+    "version": 1
+  },
+  {
+    "key": "Upload.MaxSizeMB",
+    "value": "10",
+    "group": "附件",
+    "description": "單一附件大小上限（MB）",
+    "valueType": "int",
+    "id": 10,
+    "version": 1
+  },
+  {
+    "key": "Upload.AllowedExtensions",
+    "value": ".pdf,.jpg,.jpeg,.png,.xlsx,.docx",
+    "group": "附件",
+    "description": "允許的副檔名（逗號分隔）",
+    "valueType": "string",
+    "id": 11,
+    "version": 1
+  },
+  {
+    "key": "Upload.MaxFilesPerDocument",
+    "value": "10",
+    "group": "附件",
+    "description": "每張單據附件數上限",
+    "valueType": "int",
+    "id": 12,
+    "version": 1
+  },
+  {
+    "key": "BatchApprove.Enabled",
+    "value": "true",
+    "group": "簽核",
+    "description": "是否開放批次核准（僅限設定為低風險的單別）",
+    "valueType": "bool",
+    "id": 13,
+    "version": 1
+  },
+  {
+    "key": "Sla.DefaultHours",
+    "value": "16",
+    "group": "時效",
+    "description": "關卡未設定時效時的預設工作時數",
+    "valueType": "int",
+    "id": 14,
+    "version": 1
+  },
+  {
+    "key": "Sla.ReminderBeforeHours",
+    "value": "4",
+    "group": "時效",
+    "description": "到期前幾個工作小時發送提醒",
+    "valueType": "int",
+    "id": 15,
+    "version": 1
+  },
+  {
+    "key": "Sla.AutoEscalate",
+    "value": "true",
+    "group": "時效",
+    "description": "逾時後是否自動升級給上一層主管",
+    "valueType": "bool",
+    "id": 16,
+    "version": 1
+  },
+  {
+    "key": "Sla.EscalateAfterOverdueHours",
+    "value": "8",
+    "group": "時效",
+    "description": "逾時超過幾個工作小時後自動升級",
+    "valueType": "int",
+    "id": 17,
+    "version": 1
+  },
+  {
+    "key": "Digest.Enabled",
+    "value": "true",
+    "group": "通知",
+    "description": "是否寄送每日待辦摘要",
+    "valueType": "bool",
+    "id": 18,
+    "version": 1
+  },
+  {
+    "key": "Digest.Hour",
+    "value": "8",
+    "group": "通知",
+    "description": "每日待辦摘要寄送時間（時）",
+    "valueType": "int",
+    "id": 19,
+    "version": 1
+  },
+  {
+    "key": "Email.Enabled",
+    "value": "true",
+    "group": "通知",
+    "description": "是否寄送 Email（模擬寫入 outbox）",
+    "valueType": "bool",
+    "id": 20,
+    "version": 1
+  },
+  {
+    "key": "Email.FromAddress",
+    "value": "approval@calculus.example",
+    "group": "通知",
+    "description": "寄件者地址",
+    "valueType": "string",
+    "id": 21,
+    "version": 1
+  }
+]

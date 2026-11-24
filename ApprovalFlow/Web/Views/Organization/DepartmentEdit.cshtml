@@ -1,0 +1,61 @@
+@model DepartmentEditViewModel
+@{
+    var isNew = Model.Input.Id == 0;
+    ViewData["Title"] = isNew ? "新增部門" : "編輯部門";
+}
+<div class="page-header">
+    <div>
+        <nav aria-label="breadcrumb"><ol class="breadcrumb small mb-1"><li class="breadcrumb-item"><a asp-action="Index">組織架構</a></li><li class="breadcrumb-item active">@ViewData["Title"]</li></ol></nav>
+        <h1 class="page-title">@ViewData["Title"]</h1>
+    </div>
+</div>
+
+<div class="card form-card">
+    <div class="card-body">
+        @if (!Model.IsActive)
+        {
+            <div class="alert alert-secondary small"><i class="bi bi-slash-circle me-1"></i>此部門目前為停用狀態。</div>
+        }
+        <form method="post" asp-action="SaveDepartment" novalidate>
+            <input type="hidden" asp-for="Input.Id" />
+            <input type="hidden" asp-for="Input.Version" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger small" role="alert"></div>
+            <div class="row g-3">
+                <div class="col-sm-4">
+                    <label asp-for="Input.Code" class="form-label required"></label>
+                    <input asp-for="Input.Code" class="form-control text-uppercase" maxlength="10" />
+                    <span asp-validation-for="Input.Code" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-sm-8">
+                    <label asp-for="Input.Name" class="form-label required"></label>
+                    <input asp-for="Input.Name" class="form-control" maxlength="30" />
+                    <span asp-validation-for="Input.Name" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-sm-6">
+                    <label asp-for="Input.ParentId" class="form-label"></label>
+                    <select asp-for="Input.ParentId" asp-items="Model.Parents" class="form-select">
+                        <option value="">（無，最上層）</option>
+                    </select>
+                    <span asp-validation-for="Input.ParentId" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-sm-6">
+                    <label asp-for="Input.ManagerId" class="form-label"></label>
+                    <select asp-for="Input.ManagerId" asp-items="Model.Managers" class="form-select">
+                        <option value="">（未設定）</option>
+                    </select>
+                    <div class="form-text">部門主管會成為「部門主管」關卡的簽核人。</div>
+                    <span asp-validation-for="Input.ManagerId" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-sm-4">
+                    <label asp-for="Input.SortOrder" class="form-label"></label>
+                    <input asp-for="Input.SortOrder" class="form-control" type="number" min="0" max="999" />
+                    <span asp-validation-for="Input.SortOrder" class="invalid-feedback d-block"></span>
+                </div>
+            </div>
+            <div class="form-actions">
+                <a asp-action="Index" class="btn btn-outline-secondary">取消</a>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>儲存</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,41 @@
+@model DocumentDetailsViewModel
+@{
+    var p = Model.Permissions;
+}
+@if (p.CanSubmit)
+{
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-submit"><i class="bi bi-send me-1"></i>@(Model.Document.Status == DocumentStatus.Draft ? "送出" : "重新送出")</button>
+}
+@if (p.CanApprove)
+{
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modal-approve"><i class="bi bi-check-lg me-1"></i>核准</button>
+    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modal-reject"><i class="bi bi-x-lg me-1"></i>駁回</button>
+    <div class="dropdown d-grid">
+        <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">更多</button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li><button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-returnApplicant"><i class="bi bi-arrow-return-left me-2"></i>退回申請人</button></li>
+            @if (p.CanReturnToPrevious)
+            {
+                <li><button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-returnPrevious"><i class="bi bi-arrow-90deg-up me-2"></i>退回上一關</button></li>
+            }
+            @if (p.CanAddSigner)
+            {
+                <li><button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-addSigner"><i class="bi bi-person-plus me-2"></i>加簽</button></li>
+            }
+            <li><button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-transfer"><i class="bi bi-arrow-left-right me-2"></i>轉簽</button></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-comment"><i class="bi bi-chat-left-text me-2"></i>留言</button></li>
+        </ul>
+    </div>
+}
+else
+{
+    @if (p.CanWithdraw)
+    {
+        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modal-withdraw"><i class="bi bi-arrow-counterclockwise me-1"></i>撤回</button>
+    }
+    @if (p.CanComment)
+    {
+        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modal-comment"><i class="bi bi-chat-left-text me-1"></i>留言</button>
+    }
+}

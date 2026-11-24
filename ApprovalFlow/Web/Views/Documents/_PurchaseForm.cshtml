@@ -1,0 +1,63 @@
+@model DocumentEditViewModel
+@{
+    var items = Model.Input.Purchase.Items;
+    if (items.Count == 0) items.Add(new PurchaseItemInput { Quantity = 1, Unit = "個" });
+    const string placeholder = "__i__";
+    var blankItem = new PurchaseItemInput { Quantity = 1, Unit = "個" };
+}
+<div class="card">
+    <div class="card-header fw-semibold"><i class="bi bi-cart me-2"></i>採購資訊</div>
+    <div class="card-body row g-3">
+        <div class="col-12">
+            <label class="form-label required" for="Input_Purchase_Purpose">採購目的</label>
+            <input asp-for="Input.Purchase.Purpose" class="form-control" maxlength="200" placeholder="例：新進人員到職使用、舊設備汰換" />
+            <span asp-validation-for="Input.Purchase.Purpose" class="invalid-feedback d-block"></span>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label required" for="Input_Purchase_BudgetSubjectId">預算科目</label>
+            <select asp-for="Input.Purchase.BudgetSubjectId" asp-items="Model.BudgetSubjects" class="form-select">
+                <option value="0">請選擇</option>
+            </select>
+            <span asp-validation-for="Input.Purchase.BudgetSubjectId" class="invalid-feedback d-block"></span>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="Input_Purchase_SupplierId">建議供應商</label>
+            <select asp-for="Input.Purchase.SupplierId" asp-items="Model.Suppliers" class="form-select">
+                <option value="">（由採購人員決定）</option>
+            </select>
+            <span asp-validation-for="Input.Purchase.SupplierId" class="invalid-feedback d-block"></span>
+        </div>
+        <div class="col-6 col-md-4">
+            <label class="form-label required" for="Input_Purchase_RequiredDate">需求日期</label>
+            <input asp-for="Input.Purchase.RequiredDate" type="date" class="form-control" />
+            <span asp-validation-for="Input.Purchase.RequiredDate" class="invalid-feedback d-block"></span>
+        </div>
+        <div class="col-6 col-md-8">
+            <label class="form-label" for="Input_Purchase_DeliveryLocation">交貨地點</label>
+            <input asp-for="Input.Purchase.DeliveryLocation" class="form-control" maxlength="100" />
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span class="fw-semibold"><i class="bi bi-list-ol me-2"></i>採購品項</span>
+        <button type="button" class="btn btn-sm btn-outline-primary" data-line-add="purchase"><i class="bi bi-plus-lg me-1"></i>新增品項</button>
+    </div>
+    <div class="card-body">
+        <span asp-validation-for="Input.Purchase.Items" class="invalid-feedback d-block mb-2"></span>
+        <div class="line-items" data-line-list="purchase" data-prefix="Input.Purchase.Items">
+            @for (var i = 0; i < items.Count; i++)
+            {
+                <partial name="_PurchaseItemRow" model="(items[i], i.ToString())" />
+            }
+        </div>
+        <template data-line-template="purchase">
+            <partial name="_PurchaseItemRow" model="(blankItem, placeholder)" />
+        </template>
+        <div class="line-total">
+            合計 <strong>NT$ <span data-line-total="purchase">0</span></strong>
+            <span class="small text-body-secondary ms-2">（含稅；送出時由系統重新計算）</span>
+        </div>
+    </div>
+</div>

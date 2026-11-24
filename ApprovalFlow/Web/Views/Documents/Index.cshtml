@@ -1,0 +1,223 @@
+@model DocumentListViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    var f = Model.Filter;
+    var box = f.ParsedBox;
+    var tabs = new (string Key, string Label, string Icon, int? Count)[]
+    {
+        ("todo", "待我簽核", "bi-inbox", Model.Counts.Todo),
+        ("done", "已辦", "bi-check2-square", null),
+        ("mine", "我的申請", "bi-send", null),
+        ("cc", "抄送給我", "bi-envelope-paper", null),
+        ("drafts", "草稿 / 待修改", "bi-pencil-square", Model.Counts.Drafts)
+    };
+    var sorts = new List<(string Key, string Label)>();
+    if (box == ApprovalFlow.Application.Documents.DocumentBox.Todo) sorts.Add(("due", "期限最近"));
+    sorts.AddRange([("submitted", "送出時間（新→舊）"), ("submitted_asc", "送出時間（舊→新）"), ("updated", "最後更新"), ("amount", "金額 / 時數（大→小）")]);
+    var currentSort = f.Sort ?? (box == ApprovalFlow.Application.Documents.DocumentBox.Todo ? "due" : box == ApprovalFlow.Application.Documents.DocumentBox.Drafts ? "updated" : "submitted");
+    var isTodo = box == ApprovalFlow.Application.Documents.DocumentBox.Todo;
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">@Model.Title</h1>
+    </div>
+    <a class="btn btn-primary d-none d-md-inline-block" asp-action="New"><i class="bi bi-plus-lg me-1"></i>新增申請</a>
+</div>
+
+<div class="box-tabs mb-3" role="tablist">
+    @foreach (var t in tabs)
+    {
+        <a class="box-tab @(f.Box == t.Key ? "active" : "")" asp-action="Index" asp-route-box="@t.Key" role="tab" aria-selected="@(f.Box == t.Key ? "true" : "false")">
+            <i class="bi @t.Icon"></i><span>@t.Label</span>
+            @if (t.Count > 0) { <span class="badge rounded-pill @(t.Key == "todo" ? "text-bg-danger" : "text-bg-secondary")">@t.Count</span> }
+        </a>
+    }
+</div>
+
+<form method="get" asp-action="Index" class="card mb-3">
+    <input type="hidden" name="box" value="@f.Box" />
+    <div class="card-body py-3">
+        <div class="row g-2 align-items-end">
+            <div class="col-12 col-lg-4">
+                <label class="form-label small mb-1" for="q">關鍵字</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="search" class="form-control" id="q" name="q" value="@f.Q" placeholder="單號、主旨、申請人、事由、明細" />
+                </div>
+            </div>
+            <div class="col-6 col-lg-2">
+                <label class="form-label small mb-1" for="type">單別</label>
+                <select class="form-select" id="type" name="type">
+                    <option value="">全部</option>
+                    @foreach (var t in Enum.GetValues<DocumentType>())
+                    {
+                        <option value="@t" selected="@(f.Type == t)">@t.ToDisplay()</option>
+                    }
+                </select>
+            </div>
+            <div class="col-6 col-lg-2">
+                <label class="form-label small mb-1" for="status">狀態</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">全部</option>
+                    @foreach (var s in Enum.GetValues<DocumentStatus>().Where(s => s != DocumentStatus.Draft || box == ApprovalFlow.Application.Documents.DocumentBox.Drafts))
+                    {
+                        <option value="@s" selected="@(f.Status == s)">@s.ToDisplay()</option>
+                    }
+                </select>
+            </div>
+            <div class="col-6 col-lg-2">
+                <label class="form-label small mb-1" for="from">送出日（起）</label>
+                <input type="date" class="form-control" id="from" name="from" value="@f.From?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-6 col-lg-2">
+                <label class="form-label small mb-1" for="to">送出日（迄）</label>
+                <input type="date" class="form-control" id="to" name="to" value="@f.To?.ToString("yyyy-MM-dd")" />
+            </div>
+        </div>
+        <div class="d-flex flex-wrap gap-2 align-items-center mt-2">
+            <label class="small text-body-secondary" for="sort">排序</label>
+            <select class="form-select form-select-sm w-auto js-autosubmit" id="sort" name="sort">
+                @foreach (var (key, label) in sorts)
+                {
+                    <option value="@key" selected="@(currentSort == key)">@label</option>
+                }
+            </select>
+            <div class="ms-auto d-flex gap-2">
+                @if (f.HasFilter) { <a class="btn btn-sm btn-outline-secondary" asp-action="Index" asp-route-box="@f.Box"><i class="bi bi-x-lg me-1"></i>清除</a> }
+                <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-funnel me-1"></i>查詢</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (Model.Rows.TotalCount == 0)
+{
+    <div class="card"><div class="card-body empty-state py-5">
+        <div class="empty-state-icon"><i class="bi @(isTodo ? "bi-check2-circle" : "bi-inbox")"></i></div>
+        <p class="text-body-secondary mb-0">@(f.HasFilter ? "沒有符合條件的單據" : isTodo ? "太好了，目前沒有待簽核的單據" : "目前沒有單據")</p>
+    </div></div>
+}
+else
+{
+    <form method="post" asp-action="BatchApprove" id="batchForm" data-confirm="確定要核准勾選的單據嗎？">
+        <input type="hidden" name="returnUrl" value="@returnUrl" />
+        @if (Model.BatchEnabled)
+        {
+            <div class="batch-bar card mb-2">
+                <div class="card-body py-2 d-flex flex-wrap align-items-center gap-2">
+                    <div class="form-check mb-0">
+                        <input class="form-check-input" type="checkbox" id="batchAll" data-batch-all />
+                        <label class="form-check-label small" for="batchAll">全選可批次核准的單據</label>
+                    </div>
+                    <span class="small text-body-secondary">已選 <strong data-batch-count>0</strong> 張・僅低風險單別（請假、加班）可批次核准</span>
+                    <input type="text" name="comment" class="form-control form-control-sm ms-md-auto batch-comment" maxlength="300" placeholder="意見（選填，預設「批次核准」）" aria-label="批次核准意見" />
+                    <button type="submit" class="btn btn-sm btn-success" data-batch-submit disabled><i class="bi bi-check2-all me-1"></i>批次核准</button>
+                </div>
+            </div>
+        }
+
+        @* 桌機：表格 *@
+        <div class="card d-none d-lg-block">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 doc-table">
+                    <thead class="table-light">
+                        <tr>
+                            @if (Model.BatchEnabled) { <th class="col-check"></th> }
+                            <th>單號 / 主旨</th><th>申請人</th><th>內容</th>
+                            <th>@(isTodo ? "目前關卡 / 期限" : "狀態")</th>
+                            <th class="text-end">@(box == ApprovalFlow.Application.Documents.DocumentBox.Drafts ? "最後更新" : "送出時間")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model.Rows.Items)
+                        {
+                            var d = r.Document;
+                            <tr class="@(r.IsOverdue ? "table-danger-subtle" : "")">
+                                @if (Model.BatchEnabled)
+                                {
+                                    <td class="col-check">
+                                        @if (r.CanBatchApprove)
+                                        {
+                                            <input class="form-check-input" type="checkbox" name="ids" value="@d.Id" data-batch-item aria-label="勾選 @d.DocumentNo" />
+                                            <input type="hidden" name="versions" value="@d.Version" disabled data-batch-version />
+                                        }
+                                    </td>
+                                }
+                                <td class="min-w-0">
+                                    <div class="small text-body-secondary">
+                                        @d.DocumentType.ToDisplay()・@(string.IsNullOrEmpty(d.DocumentNo) ? "未送出" : d.DocumentNo)
+                                        @if (d.IsUrgent) { <span class="badge text-bg-danger ms-1">急件</span> }
+                                        @if (r.OnBehalfOfId is int ob) { <span class="badge text-bg-info ms-1">代理</span> }
+                                    </div>
+                                    <a class="fw-semibold text-decoration-none stretched-link-cell" asp-action="Details" asp-route-id="@d.Id">@d.Title</a>
+                                </td>
+                                <td class="text-nowrap">@r.ApplicantName<div class="small text-body-secondary">@r.DepartmentName</div></td>
+                                <td class="small">@r.Summary</td>
+                                <td class="small">
+                                    @if (isTodo)
+                                    {
+                                        <div>@r.CurrentStepName</div>
+                                        <div class="@(r.IsOverdue ? "text-danger fw-semibold" : "text-body-secondary")">@(r.DueAt?.ToString("MM/dd HH:mm"))@(r.IsOverdue ? " 已逾時" : "")</div>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge @d.Status.ToBadgeClass()">@d.Status.ToDisplay()</span>
+                                        @if (r.CurrentStepName != null) { <div class="text-body-secondary">@r.CurrentStepName</div> }
+                                    }
+                                </td>
+                                <td class="text-end small text-nowrap text-body-secondary">
+                                    @((box == ApprovalFlow.Application.Documents.DocumentBox.Drafts ? d.UpdatedAt : d.SubmittedAt ?? d.CreatedAt).ToString("yyyy/MM/dd HH:mm"))
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @* 手機 / 平板：卡片 *@
+        <div class="d-lg-none vstack gap-2">
+            @foreach (var r in Model.Rows.Items)
+            {
+                var d = r.Document;
+                <div class="card doc-card @(r.IsOverdue ? "is-overdue" : "")">
+                    <div class="card-body py-3 d-flex gap-2">
+                        @if (Model.BatchEnabled && r.CanBatchApprove)
+                        {
+                            <input class="form-check-input mt-1 flex-shrink-0" type="checkbox" name="ids" value="@d.Id" data-batch-item aria-label="勾選 @d.DocumentNo" />
+                            <input type="hidden" name="versions" value="@d.Version" disabled data-batch-version />
+                        }
+                        <a class="min-w-0 flex-grow-1 text-decoration-none text-body" asp-action="Details" asp-route-id="@d.Id">
+                            <div class="d-flex justify-content-between gap-2">
+                                <span class="small text-body-secondary text-truncate">
+                                    @d.DocumentType.ToDisplay()・@(string.IsNullOrEmpty(d.DocumentNo) ? "未送出" : d.DocumentNo)
+                                </span>
+                                <span class="badge @d.Status.ToBadgeClass() flex-shrink-0">@d.Status.ToDisplay()</span>
+                            </div>
+                            <div class="fw-semibold text-truncate">
+                                @if (d.IsUrgent) { <span class="badge text-bg-danger me-1">急件</span> }
+                                @d.Title
+                            </div>
+                            <div class="small text-body-secondary text-truncate">@r.ApplicantName・@r.Summary</div>
+                            @if (r.CurrentStepName != null)
+                            {
+                                <div class="small @(r.IsOverdue ? "text-danger fw-semibold" : "text-body-secondary")">
+                                    <i class="bi bi-signpost-2"></i> @r.CurrentStepName
+                                    @if (isTodo && r.DueAt is { } due) { <span>・期限 @due.ToString("MM/dd HH:mm")</span> }
+                                    @if (r.OnBehalfOfId is int) { <span class="badge text-bg-info ms-1">代理</span> }
+                                </div>
+                            }
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </form>
+}
+
+<partial name="_Pager" model="Model.Pager" />
+
+@section Scripts {
+    <script src="~/js/document-list.js" asp-append-version="true"></script>
+}

@@ -1,0 +1,25 @@
+﻿@model ErrorViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    // 未登入時改用簡易版型，避免版型本身需要使用者資料
+    if (User.Identity?.IsAuthenticated != true) { Layout = "_AuthLayout"; }
+}
+<div class="empty-state py-4">
+    <div class="empty-state-icon @(Model.StatusCode >= 500 ? "text-danger" : "text-secondary")">
+        <i class="bi @(Model.StatusCode switch { 404 => "bi-compass", 403 => "bi-shield-lock", 429 => "bi-hourglass-split", _ => "bi-exclamation-octagon" })"></i>
+    </div>
+    <h1 class="h4">@Model.Title</h1>
+    <p class="text-body-secondary">@Model.Message</p>
+    @if (!string.IsNullOrEmpty(Model.RequestId))
+    {
+        <p class="small text-body-secondary">追蹤代碼：<code>@Model.RequestId</code></p>
+    }
+    <a class="btn btn-primary" href="~/"><i class="bi bi-house-door me-1"></i>回首頁</a>
+</div>
+@if (!string.IsNullOrEmpty(Model.Detail))
+{
+    <details class="mt-3">
+        <summary class="small text-danger">開發模式：例外詳細資訊</summary>
+        <pre class="small bg-body-tertiary p-3 rounded mt-2 text-wrap">@Model.Detail</pre>
+    </details>
+}

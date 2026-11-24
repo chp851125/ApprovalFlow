@@ -1,0 +1,226 @@
+[
+  {
+    "prefix": "EX",
+    "period": "202512",
+    "lastNumber": 1,
+    "id": 1,
+    "version": 1
+  },
+  {
+    "prefix": "LV",
+    "period": "202512",
+    "lastNumber": 1,
+    "id": 2,
+    "version": 1
+  },
+  {
+    "prefix": "EX",
+    "period": "202601",
+    "lastNumber": 2,
+    "id": 3,
+    "version": 1
+  },
+  {
+    "prefix": "LV",
+    "period": "202601",
+    "lastNumber": 1,
+    "id": 4,
+    "version": 1
+  },
+  {
+    "prefix": "EX",
+    "period": "202602",
+    "lastNumber": 2,
+    "id": 5,
+    "version": 1
+  },
+  {
+    "prefix": "PR",
+    "period": "202602",
+    "lastNumber": 1,
+    "id": 6,
+    "version": 1
+  },
+  {
+    "prefix": "LV",
+    "period": "202603",
+    "lastNumber": 3,
+    "id": 7,
+    "version": 1
+  },
+  {
+    "prefix": "OT",
+    "period": "202603",
+    "lastNumber": 1,
+    "id": 8,
+    "version": 1
+  },
+  {
+    "prefix": "LV",
+    "period": "202604",
+    "lastNumber": 2,
+    "id": 9,
+    "version": 1
+  },
+  {
+    "prefix": "OT",
+    "period": "202604",
+    "lastNumber": 2,
+    "id": 10,
+    "version": 1
+  },
+  {
+    "prefix": "EX",
+    "period": "202605",
+    "lastNumber": 2,
+    "id": 11,
+    "version": 1
+  },
+  {
+    "prefix": "PR",
+    "period": "202605",
+    "lastNumber": 1,
+    "id": 12,
+    "version": 1
+  },
+  {
+    "prefix": "EX",
+    "period": "202606",
+    "lastNumber": 1,
+    "id": 13,
+    "version": 1
+  },
+  {
+    "prefix": "PR",
+    "period": "202606",
+    "lastNumber": 1,
+    "id": 14,
+    "version": 1
+  },
+  {
+    "prefix": "EX",
+    "period": "202607",
+    "lastNumber": 1,
+    "id": 15,
+    "version": 1
+  },
+  {
+    "prefix": "LV",
+    "period": "202607",
+    "lastNumber": 1,
+    "id": 16,
+    "version": 1
+  },
+  {
+    "prefix": "OT",
+    "period": "202607",
+    "lastNumber": 1,
+    "id": 17,
+    "version": 1
+  },
+  {
+    "prefix": "PR",
+    "period": "202607",
+    "lastNumber": 1,
+    "id": 18,
+    "version": 1
+  },
+  {
+    "prefix": "EX",
+    "period": "202608",
+    "lastNumber": 1,
+    "id": 19,
+    "version": 1
+  },
+  {
+    "prefix": "LV",
+    "period": "202608",
+    "lastNumber": 1,
+    "id": 20,
+    "version": 1
+  },
+  {
+    "prefix": "OT",
+    "period": "202608",
+    "lastNumber": 1,
+    "id": 21,
+    "version": 1
+  },
+  {
+    "prefix": "PR",
+    "period": "202608",
+    "lastNumber": 1,
+    "id": 22,
+    "version": 1
+  },
+  {
+    "prefix": "EX",
+    "period": "202609",
+    "lastNumber": 2,
+    "id": 23,
+    "version": 1
+  },
+  {
+    "prefix": "LV",
+    "period": "202609",
+    "lastNumber": 1,
+    "id": 24,
+    "version": 1
+  },
+  {
+    "prefix": "PR",
+    "period": "202609",
+    "lastNumber": 1,
+    "id": 25,
+    "version": 1
+  },
+  {
+    "prefix": "EX",
+    "period": "202610",
+    "lastNumber": 2,
+    "id": 26,
+    "version": 1
+  },
+  {
+    "prefix": "LV",
+    "period": "202610",
+    "lastNumber": 2,
+    "id": 27,
+    "version": 1
+  },
+  {
+    "prefix": "OT",
+    "period": "202610",
+    "lastNumber": 2,
+    "id": 28,
+    "version": 1
+  },
+  {
+    "prefix": "EX",
+    "period": "202611",
+    "lastNumber": 7,
+    "id": 29,
+    "version": 1
+  },
+  {
+    "prefix": "LV",
+    "period": "202611",
+    "lastNumber": 2,
+    "id": 30,
+    "version": 1
+  },
+  {
+    "prefix": "OT",
+    "period": "202611",
+    "lastNumber": 5,
+    "id": 31,
+    "version": 1
+  },
+  {
+    "prefix": "PR",
+    "period": "202611",
+    "lastNumber": 2,
+    "id": 32,
+    "version": 1
+  }
+]

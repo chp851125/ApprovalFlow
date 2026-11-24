@@ -1,0 +1,39 @@
+@model List<LeaveType>
+@{
+    ViewData["Title"] = "假別設定";
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">假別設定</h1>
+        <div class="text-body-secondary small">假別額度與最小單位會用於請假單的餘額檢查。停用的假別不會出現在請假單選項中，但歷史單據仍保留。</div>
+    </div>
+    <a class="btn btn-primary" asp-action="Create"><i class="bi bi-plus-lg me-1"></i>新增假別</a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr><th>代碼</th><th>假別</th><th class="text-end">年度額度</th><th class="text-end">給薪</th><th class="text-end">最小單位</th><th class="text-center">需證明</th><th class="text-center">狀態</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var x in Model)
+                {
+                    <tr class="@(x.IsActive ? "" : "text-body-secondary")">
+                        <td><span class="badge text-bg-light border">@x.Code</span></td>
+                        <td>
+                            <span class="fw-semibold">@x.Name</span>
+                            @if (!string.IsNullOrEmpty(x.Description)) { <div class="small text-body-secondary text-truncate cell-desc">@x.Description</div> }
+                        </td>
+                        <td class="text-end text-nowrap">@(x.UseSeniorityQuota ? "依年資" : x.DefaultQuotaHours is decimal q ? $"{q:0.#} 小時（{q / 8:0.#} 天）" : "不限")</td>
+                        <td class="text-end">@(x.PayRatio == 1 ? "全薪" : x.PayRatio == 0 ? "不給薪" : $"{x.PayRatio:P0}")</td>
+                        <td class="text-end">@x.MinUnitHours.ToString("0.#") 小時</td>
+                        <td class="text-center">@if (x.RequiresAttachment) { <i class="bi bi-paperclip text-primary" title="需附證明"></i> } else { <span class="text-body-secondary">—</span> }</td>
+                        <td class="text-center">@if (x.IsActive) { <span class="badge text-bg-success">啟用</span> } else { <span class="badge text-bg-secondary">停用</span> }</td>
+                        <td class="text-end"><a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@x.Id"><i class="bi bi-pencil"></i></a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+@model ActionModalModel
+@{
+    var d = Model.Page.Document;
+    var id = $"modal-{Model.Action}";
+}
+<div class="modal fade" id="@id" tabindex="-1" aria-labelledby="@(id)-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+        <form class="modal-content" method="post" asp-action="Act" asp-route-id="@d.Id">
+            <input type="hidden" name="version" value="@d.Version" />
+            <input type="hidden" name="action" value="@Model.Action" />
+            @if (Model.Action is "approve" or "reject" or "returnApplicant" or "returnPrevious" or "transfer")
+            {
+                @* 處理完回到待辦清單，方便連續簽核 *@
+                <input type="hidden" name="next" value="todo" />
+            }
+            @if (Model.Page.Permissions.OnBehalfOfId is int ob)
+            {
+                <input type="hidden" name="asPrincipalId" value="@ob" />
+            }
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="@(id)-title"><i class="bi @Model.Icon me-2"></i>@Model.Title</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+            </div>
+            <div class="modal-body">
+                <div class="small text-body-secondary mb-3">@(string.IsNullOrEmpty(d.DocumentNo) ? "" : d.DocumentNo + "・")@d.Title</div>
+                @if (Model.NeedsTarget)
+                {
+                    <div class="mb-3">
+                        <label class="form-label required" for="@(id)-target">指定人員</label>
+                        <select class="form-select" id="@(id)-target" name="targetId" asp-items="Model.Page.TargetCandidates" required>
+                            <option value="">請選擇</option>
+                        </select>
+                    </div>
+                }
+                <label class="form-label @(Model.CommentRequired ? "required" : "")" for="@(id)-comment">@(Model.Action == "comment" ? "留言內容" : "意見")</label>
+                <textarea class="form-control" id="@(id)-comment" name="comment" rows="3" maxlength="500" required="@Model.CommentRequired"
+                          placeholder="@(Model.CommentRequired ? "請填寫原因或說明" : "（選填）")"></textarea>
+                @if (!string.IsNullOrEmpty(Model.Hint))
+                {
+                    <div class="form-text"><i class="bi bi-info-circle"></i> @Model.Hint</div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" class="btn @Model.ButtonClass"><i class="bi @Model.Icon me-1"></i>@Model.ButtonText</button>
+            </div>
+        </form>
+    </div>
+</div>

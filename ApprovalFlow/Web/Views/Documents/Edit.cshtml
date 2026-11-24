@@ -1,0 +1,172 @@
+@model DocumentEditViewModel
+@{
+    var input = Model.Input;
+    var typeName = Model.Config?.Name ?? input.DocumentType.ToDisplay();
+    ViewData["Title"] = Model.IsNew ? $"新增{typeName}" : Model.IsResubmit ? $"修改{typeName}" : $"編輯{typeName}草稿";
+    var existing = Model.Existing;
+    ViewData["StickyActionsMobileOnly"] = true;
+}
+<div class="page-header">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb small mb-1">
+                <li class="breadcrumb-item"><a asp-action="Index" asp-route-box="drafts">草稿 / 待修改</a></li>
+                @if (existing != null && !string.IsNullOrEmpty(existing.DocumentNo))
+                {
+                    <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@existing.Id">@existing.DocumentNo</a></li>
+                }
+                <li class="breadcrumb-item active">@ViewData["Title"]</li>
+            </ol>
+        </nav>
+        <h1 class="page-title">@ViewData["Title"]</h1>
+    </div>
+    @if (existing != null && existing.Status == DocumentStatus.Draft && string.IsNullOrEmpty(existing.DocumentNo))
+    {
+        <form method="post" asp-action="Delete" data-confirm="確定要刪除這份草稿嗎？附件也會一併刪除。">
+            <input type="hidden" name="id" value="@existing.Id" />
+            <input type="hidden" name="version" value="@existing.Version" />
+            <button type="submit" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash me-1"></i>刪除草稿</button>
+        </form>
+    }
+</div>
+
+@if (existing?.Status == DocumentStatus.Returned)
+{
+    var returned = existing.History.LastOrDefault(h => h.Action == ApprovalActionType.ReturnToApplicant);
+    <div class="alert alert-warning">
+        <i class="bi bi-arrow-return-left me-1"></i>此單據已被退回，請依意見修改後重新送出（流程會從第一關重新開始）。
+        @if (returned?.Comment != null) { <div class="mt-1"><strong>退回意見：</strong>@returned.Comment</div> }
+    </div>
+}
+else if (existing?.Status == DocumentStatus.Withdrawn)
+{
+    <div class="alert alert-info"><i class="bi bi-arrow-counterclockwise me-1"></i>此單據已撤回，修改後可重新送出。</div>
+}
+
+<form method="post" asp-action="Save" enctype="multipart/form-data" id="documentForm" novalidate
+      data-leave-hours-url="@Url.Action("LeaveHours")" data-document-id="@(existing?.Id)">
+    <input type="hidden" asp-for="Input.Id" />
+    <input type="hidden" asp-for="Input.Version" />
+    <input type="hidden" asp-for="Input.DocumentType" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+    <div class="row g-3">
+        <div class="col-xl-8 d-flex flex-column gap-3">
+            @switch (input.DocumentType)
+            {
+                case DocumentType.Leave: <partial name="_LeaveForm" model="Model" /> break;
+                case DocumentType.Expense: <partial name="_ExpenseForm" model="Model" /> break;
+                case DocumentType.Purchase: <partial name="_PurchaseForm" model="Model" /> break;
+                case DocumentType.Overtime: <partial name="_OvertimeForm" model="Model" /> break;
+            }
+
+            <div class="card">
+                <div class="card-header fw-semibold"><i class="bi bi-card-text me-2"></i>其他資訊</div>
+                <div class="card-body row g-3">
+                    <div class="col-md-8">
+                        <label asp-for="Input.Title" class="form-label"></label>
+                        <input asp-for="Input.Title" class="form-control" maxlength="100" placeholder="留白時依內容自動產生" />
+                        <span asp-validation-for="Input.Title" class="invalid-feedback d-block"></span>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="form-check form-switch mb-2">
+                            <input asp-for="Input.IsUrgent" class="form-check-input" role="switch" />
+                            <label asp-for="Input.IsUrgent" class="form-check-label">急件（簽核人清單中排在最前面）</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Input.CcEmployeeIds" class="form-label">抄送（核准後通知，最多 10 人；按住 Ctrl 可複選）</label>
+                        <select asp-for="Input.CcEmployeeIds" asp-items="Model.Colleagues" class="form-select" multiple size="4"></select>
+                        <span asp-validation-for="Input.CcEmployeeIds" class="invalid-feedback d-block"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Input.Remark" class="form-label">@(Model.IsResubmit ? "修改說明 / 備註" : "備註")</label>
+                        <textarea asp-for="Input.Remark" class="form-control" rows="2" maxlength="1000"></textarea>
+                        <span asp-validation-for="Input.Remark" class="invalid-feedback d-block"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 d-flex flex-column gap-3">
+            <div class="card">
+                <div class="card-header fw-semibold"><i class="bi bi-paperclip me-2"></i>附件（@Model.Attachments.Count / @Model.MaxFiles）</div>
+                <div class="card-body">
+                    @if (Model.Attachments.Count > 0)
+                    {
+                        <ul class="list-unstyled small mb-3">
+                            @foreach (var a in Model.Attachments)
+                            {
+                                <li class="d-flex align-items-center gap-2 py-1 border-bottom">
+                                    <i class="bi bi-file-earmark"></i>
+                                    <a class="text-truncate flex-grow-1" asp-action="Attachment" asp-route-id="@a.Id">@a.FileName</a>
+                                    <span class="text-body-secondary text-nowrap">@FileSize.Format(a.SizeBytes)</span>
+                                    <button type="submit" class="btn btn-sm btn-link text-danger p-0" formaction="@Url.Action("DeleteAttachment", new { attachmentId = a.Id, documentId = a.DocumentId })" formnovalidate
+                                            data-confirm="確定刪除「@a.FileName」？（表單其他未儲存的修改不會保留）" title="刪除" aria-label="刪除 @a.FileName"><i class="bi bi-x-circle"></i></button>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    <label class="form-label small" for="files">新增附件</label>
+                    <input type="file" class="form-control" id="files" name="files" multiple accept="@Model.AllowedExtensions" />
+                    <div class="form-text">允許 @Model.AllowedExtensions.Replace(",", "、")；單檔 @Model.MaxFileMb MB 以內。儲存或送出時一併上傳。</div>
+                    @if (ViewData.ModelState.TryGetValue("Files", out var fe) && fe.Errors.Count > 0)
+                    {
+                        @foreach (var e in fe.Errors) { <div class="invalid-feedback d-block">@e.ErrorMessage</div> }
+                    }
+                </div>
+            </div>
+
+            @if (Model.LeaveBalances.Count > 0)
+            {
+                <div class="card">
+                    <div class="card-header fw-semibold"><i class="bi bi-hourglass-split me-2"></i>@(input.Leave.StartAt?.Year ?? DateTime.Today.Year) 年假別餘額</div>
+                    <ul class="list-group list-group-flush small">
+                        @foreach (var b in Model.LeaveBalances)
+                        {
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>@b.Type.Name</span>
+                                <span class="text-end">
+                                    @if (b.Remaining is decimal r)
+                                    {
+                                        <span class="fw-semibold @(r <= 0 ? "text-danger" : "")">剩 @LeaveQuotaText(r)</span>
+                                        <span class="text-body-secondary d-block">共 @LeaveQuotaText(b.Entitled ?? 0)・已休 @LeaveQuotaText(b.Used)@(b.Pending > 0 ? $"・簽核中 {LeaveQuotaText(b.Pending)}" : "")</span>
+                                    }
+                                    else { <span class="text-body-secondary">不限</span> }
+                                </span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <div class="card d-none d-xl-block">
+                <div class="card-body d-grid gap-2">
+                    <button type="submit" name="submitAction" value="submit" class="btn btn-primary"><i class="bi bi-send me-1"></i>@(Model.IsResubmit ? "重新送出" : "送出申請")</button>
+                    <button type="submit" name="submitAction" value="draft" class="btn btn-outline-secondary" formnovalidate><i class="bi bi-save me-1"></i>儲存草稿</button>
+                    <div class="small text-body-secondary">送出前會檢查必填欄位、餘額、上限等規則；草稿不檢查。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3 d-none d-lg-flex d-xl-none justify-content-end gap-2">
+        <button type="submit" name="submitAction" value="draft" class="btn btn-outline-secondary" formnovalidate><i class="bi bi-save me-1"></i>儲存草稿</button>
+        <button type="submit" name="submitAction" value="submit" class="btn btn-primary"><i class="bi bi-send me-1"></i>@(Model.IsResubmit ? "重新送出" : "送出申請")</button>
+    </div>
+</form>
+
+@section StickyActions {
+    <div class="sticky-action-row">
+        <button type="submit" form="documentForm" name="submitAction" value="draft" class="btn btn-outline-secondary" formnovalidate><i class="bi bi-save me-1"></i>存草稿</button>
+        <button type="submit" form="documentForm" name="submitAction" value="submit" class="btn btn-primary"><i class="bi bi-send me-1"></i>@(Model.IsResubmit ? "重新送出" : "送出")</button>
+    </div>
+}
+
+@section Scripts {
+    <script src="~/js/document-form.js" asp-append-version="true"></script>
+}
+
+@functions {
+    private static string LeaveQuotaText(decimal hours) => ApprovalFlow.Application.Common.LeaveQuota.FormatHours(hours);
+}

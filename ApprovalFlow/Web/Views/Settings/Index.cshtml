@@ -1,0 +1,61 @@
+@model SettingsIndexViewModel
+@{
+    ViewData["Title"] = "系統參數";
+    var index = 0;
+    var icons = new Dictionary<string, string>
+    {
+        ["一般"] = "bi-building", ["密碼原則"] = "bi-key", ["登入安全"] = "bi-shield-lock", ["附件"] = "bi-paperclip",
+        ["簽核"] = "bi-check2-all", ["時效"] = "bi-stopwatch", ["通知"] = "bi-bell"
+    };
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">系統參數</h1>
+        <div class="text-body-secondary small">變更後立即生效。每次變更都會記錄在稽核紀錄中。</div>
+    </div>
+</div>
+
+<form method="post" asp-action="Index" novalidate>
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    <div class="row g-3">
+        @foreach (var g in Model.Groups)
+        {
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header fw-semibold"><i class="bi @(icons.GetValueOrDefault(g.Key) ?? "bi-gear") me-2"></i>@g.Key</div>
+                    <div class="card-body vstack gap-3">
+                        @foreach (var s in g)
+                        {
+                            var i = index++;
+                            var fieldId = $"setting_{s.Id}";
+                            var hasError = Model.ErrorKey == s.Key;
+                            <div>
+                                <input type="hidden" name="settings[@i].Id" value="@s.Id" />
+                                <input type="hidden" name="settings[@i].Version" value="@s.Version" />
+                                @if (s.ValueType == "bool")
+                                {
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="@fieldId" name="settings[@i].Value" value="true" checked="@(s.Value == "true")" />
+                                        <input type="hidden" name="settings[@i].Value" value="false" />
+                                        <label class="form-check-label" for="@fieldId">@s.Description</label>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <label class="form-label small mb-1" for="@fieldId">@s.Description</label>
+                                    <input class="form-control @(hasError ? "is-invalid" : "")" id="@fieldId" name="settings[@i].Value" value="@s.Value"
+                                           type="@(s.ValueType is "int" or "decimal" ? "number" : "text")" step="@(s.ValueType == "decimal" ? "0.01" : null)" maxlength="500" />
+                                }
+                                <div class="form-text"><code>@s.Key</code></div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="form-actions">
+        <a asp-action="Index" class="btn btn-outline-secondary">放棄變更</a>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>儲存全部</button>
+    </div>
+</form>

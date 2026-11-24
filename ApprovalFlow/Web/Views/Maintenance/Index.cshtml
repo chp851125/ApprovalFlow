@@ -1,0 +1,55 @@
+@model MaintenanceViewModel
+@{
+    ViewData["Title"] = "資料維護";
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">資料維護</h1>
+        <div class="text-body-secondary small">系統資料以 JSON 檔儲存，每個實體一個檔案；寫入時先寫暫存檔再取代，避免檔案損毀。</div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header fw-semibold"><i class="bi bi-database me-2"></i>資料檔案（@Model.DataPath）</div>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light"><tr><th>檔案</th><th class="text-end">大小</th><th>最後寫入</th></tr></thead>
+                    <tbody>
+                        @foreach (var f in Model.Files)
+                        {
+                            <tr><td><code>@f.FileName</code></td><td class="text-end small">@FileSize.Format(f.SizeBytes)</td><td class="small">@(f.LastWrite?.ToString("yyyy/MM/dd HH:mm:ss") ?? "—")</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-body small text-body-secondary border-top">
+                附件：<code>@Model.UploadPath</code>（@Model.UploadCount 個檔案）・模擬郵件：<code>@Model.OutboxPath</code>（@Model.OutboxCount 封）
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card border-danger">
+            <div class="card-header fw-semibold text-danger"><i class="bi bi-arrow-counterclockwise me-2"></i>重設為範例資料</div>
+            <div class="card-body">
+                <p class="small">以 <code>@Model.SeedPath</code> 的範例資料覆蓋目前所有資料，並清除上傳的附件與模擬郵件。適合展示或測試後還原環境。</p>
+                <div class="alert alert-warning small mb-3"><i class="bi bi-exclamation-triangle me-1"></i>此動作無法復原，所有新增的單據、帳號與設定變更都會遺失。</div>
+                <form method="post" asp-action="Reset" data-confirm="最後確認：確定要將所有資料重設為範例資料嗎？">
+                    <label class="form-label small" for="confirm">請輸入 <strong>@Model.ConfirmText</strong> 以確認</label>
+                    <div class="input-group">
+                        <input class="form-control" id="confirm" name="confirm" autocomplete="off" required />
+                        <button type="submit" class="btn btn-danger">重設資料</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card mt-3">
+            <div class="card-body small">
+                <div class="fw-semibold mb-1"><i class="bi bi-terminal me-1"></i>重新產生範例資料（開發環境）</div>
+                <code class="d-block">dotnet run -- --generate-seed --anchor 2026-11-23</code>
+                <div class="text-body-secondary mt-1">產生後再按上方「重設資料」即可套用。</div>
+            </div>
+        </div>
+    </div>
+</div>

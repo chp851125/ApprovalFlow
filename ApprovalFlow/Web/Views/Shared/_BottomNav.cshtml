@@ -1,0 +1,28 @@
+@inject LayoutService LayoutData
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    var isDocs = string.Equals(controller, "Documents", StringComparison.OrdinalIgnoreCase);
+    var box = (Context.Request.Query["box"].ToString() is { Length: > 0 } b ? b : "todo").ToLowerInvariant();
+    var counts = await LayoutData.GetCountsAsync();
+    string Active(bool on) => on ? "active" : "";
+}
+<nav class="app-bottomnav d-lg-none" aria-label="底部導覽">
+    <a class="@Active(string.Equals(controller, "Home", StringComparison.OrdinalIgnoreCase))" asp-controller="Home" asp-action="Index">
+        <i class="bi bi-house-door"></i><span>首頁</span>
+    </a>
+    <a class="@Active(isDocs && action == "Index" && box == "todo")" asp-controller="Documents" asp-action="Index" asp-route-box="todo">
+        <i class="bi bi-inbox"></i><span>待辦</span>
+        @if (counts.Todo > 0) { <span class="dot">@(counts.Todo > 99 ? "99+" : counts.Todo.ToString())</span> }
+    </a>
+    <a class="bottomnav-primary @Active(isDocs && action is "New" or "Create")" asp-controller="Documents" asp-action="New" aria-label="新增申請">
+        <span class="bottomnav-fab"><i class="bi bi-plus-lg"></i></span><span>申請</span>
+    </a>
+    <a class="@Active(isDocs && action == "Index" && box is "mine" or "drafts")" asp-controller="Documents" asp-action="Index" asp-route-box="mine">
+        <i class="bi bi-send"></i><span>我的</span>
+        @if (counts.Drafts > 0) { <span class="dot dot-muted">@counts.Drafts</span> }
+    </a>
+    <button type="button" data-bs-toggle="offcanvas" data-bs-target="#appSidebar" aria-controls="appSidebar">
+        <i class="bi bi-grid"></i><span>選單</span>
+    </button>
+</nav>

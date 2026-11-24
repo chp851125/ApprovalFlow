@@ -1,0 +1,51 @@
+@using ApprovalFlow.Application.Notifications
+@inject NotificationService Notifications
+@{
+    var unread = await Notifications.UnreadCountAsync();
+    var recent = await Notifications.RecentAsync(8);
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+<div class="dropdown">
+    <button class="btn btn-link text-white position-relative px-2" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false"
+            aria-label="通知@(unread > 0 ? $"，{unread} 則未讀" : "")">
+        <i class="bi bi-bell fs-5"></i>
+        @if (unread > 0)
+        {
+            <span class="bell-dot">@(unread > 99 ? "99+" : unread.ToString())</span>
+        }
+    </button>
+    <div class="dropdown-menu dropdown-menu-end shadow p-0 bell-menu">
+        <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+            <span class="fw-semibold">通知</span>
+            @if (unread > 0)
+            {
+                <form method="post" asp-controller="Notifications" asp-action="MarkAllRead" class="m-0">
+                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+                    <button type="submit" class="btn btn-sm btn-link p-0">全部標為已讀</button>
+                </form>
+            }
+        </div>
+        @if (recent.Count == 0)
+        {
+            <div class="px-3 py-4 text-center small text-body-secondary">目前沒有通知</div>
+        }
+        else
+        {
+            <div class="bell-list">
+                @foreach (var n in recent)
+                {
+                    var (icon, color) = n.Type.ToIcon();
+                    <a class="bell-item @(n.IsRead ? "" : "is-unread")" asp-controller="Notifications" asp-action="Open" asp-route-id="@n.Id">
+                        <span class="notification-icon bg-@color-subtle text-@color-emphasis"><i class="bi @icon"></i></span>
+                        <span class="min-w-0">
+                            <span class="d-block small fw-semibold text-truncate">@n.Title</span>
+                            <span class="d-block small text-body-secondary bell-msg">@n.Message</span>
+                            <span class="d-block text-body-secondary bell-time">@n.CreatedAt.ToString("MM/dd HH:mm")</span>
+                        </span>
+                    </a>
+                }
+            </div>
+        }
+        <a class="d-block text-center small py-2 border-top" asp-controller="Notifications" asp-action="Index">查看全部通知</a>
+    </div>
+</div>

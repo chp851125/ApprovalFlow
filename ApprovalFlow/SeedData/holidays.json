@@ -1,0 +1,114 @@
+[
+  {
+    "date": "2026-01-01",
+    "name": "中華民國開國紀念日",
+    "type": "Holiday",
+    "id": 1,
+    "version": 1
+  },
+  {
+    "date": "2026-02-16",
+    "name": "農曆除夕",
+    "type": "Holiday",
+    "id": 2,
+    "version": 1
+  },
+  {
+    "date": "2026-02-17",
+    "name": "春節",
+    "type": "Holiday",
+    "id": 3,
+    "version": 1
+  },
+  {
+    "date": "2026-02-18",
+    "name": "春節",
+    "type": "Holiday",
+    "id": 4,
+    "version": 1
+  },
+  {
+    "date": "2026-02-19",
+    "name": "春節",
+    "type": "Holiday",
+    "id": 5,
+    "version": 1
+  },
+  {
+    "date": "2026-02-20",
+    "name": "春節補假（小年夜逢週日）",
+    "type": "Holiday",
+    "id": 6,
+    "version": 1
+  },
+  {
+    "date": "2026-02-27",
+    "name": "和平紀念日補假",
+    "type": "Holiday",
+    "id": 7,
+    "version": 1
+  },
+  {
+    "date": "2026-04-03",
+    "name": "兒童節補假",
+    "type": "Holiday",
+    "id": 8,
+    "version": 1
+  },
+  {
+    "date": "2026-04-06",
+    "name": "民族掃墓節補假",
+    "type": "Holiday",
+    "id": 9,
+    "version": 1
+  },
+  {
+    "date": "2026-05-01",
+    "name": "勞動節",
+    "type": "Holiday",
+    "id": 10,
+    "version": 1
+  },
+  {
+    "date": "2026-06-19",
+    "name": "端午節",
+    "type": "Holiday",
+    "id": 11,
+    "version": 1
+  },
+  {
+    "date": "2026-09-25",
+    "name": "中秋節",
+    "type": "Holiday",
+    "id": 12,
+    "version": 1
+  },
+  {
+    "date": "2026-09-28",
+    "name": "教師節",
+    "type": "Holiday",
+    "id": 13,
+    "version": 1
+  },
+  {
+    "date": "2026-10-09",
+    "name": "國慶日補假",
+    "type": "Holiday",
+    "id": 14,
+    "version": 1
+  },
+  {
+    "date": "2026-10-26",
+    "name": "臺灣光復暨金門古寧頭大捷紀念日補假",
+    "type": "Holiday",
+    "id": 15,
+    "version": 1
+  },
+  {
+    "date": "2026-12-25",
+    "name": "行憲紀念日",
+    "type": "Holiday",
+    "id": 16,
+    "version": 1
+  }
+]

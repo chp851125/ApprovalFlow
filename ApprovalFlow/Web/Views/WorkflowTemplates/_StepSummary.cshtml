@@ -1,0 +1,16 @@
+@model (WorkflowStepDefinition Step, IReadOnlyDictionary<int, string> Names)
+@{
+    var s = Model.Step;
+    var who = s.ApproverSource switch
+    {
+        ApproverSource.Role => $"角色：{Roles.ToDisplay(s.RoleName ?? "")}",
+        ApproverSource.SpecificUser => "指定：" + string.Join("、", s.UserIds.Select(id => Model.Names.GetValueOrDefault(id) ?? $"#{id}")),
+        ApproverSource.ManagerLevelN => $"往上 {s.Levels} 級主管",
+        _ => s.ApproverSource.ToDisplay()
+    };
+}
+<span>@who</span>
+@if (s.ApproverSource is ApproverSource.Role or ApproverSource.SpecificUser)
+{
+    <span class="badge text-bg-light border ms-1">@s.Mode.ToDisplay()</span>
+}

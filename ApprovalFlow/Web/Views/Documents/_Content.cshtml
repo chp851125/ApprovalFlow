@@ -1,0 +1,98 @@
+@model DocumentContentModel
+@{
+    var d = Model.Document;
+    var c = d.Content;
+    var L = Model.Lookups;
+    var weekdays = "日一二三四五六";
+    string Emp(int? id) => id is int i ? L.Employees.GetValueOrDefault(i) ?? $"#{i}" : "—";
+    string When(DateTimeOffset t) => $"{t:yyyy/MM/dd}（{weekdays[(int)t.DayOfWeek]}）{t:HH:mm}";
+}
+@switch (d.DocumentType)
+{
+    case DocumentType.Leave when c.Leave is { } l:
+        var lt = L.LeaveTypes.GetValueOrDefault(l.LeaveTypeId);
+        <dl class="row mb-0 dl-compact">
+            <dt class="col-4 col-sm-3">假別</dt><dd class="col-8 col-sm-9">@(lt?.Name ?? "—")@if (lt is { PayRatio: < 1 }) { <span class="badge text-bg-light border ms-1">@(lt.PayRatio == 0 ? "不給薪" : $"給薪 {lt.PayRatio:P0}")</span> }</dd>
+            <dt class="col-4 col-sm-3">期間</dt><dd class="col-8 col-sm-9">@When(l.StartAt) ～ @When(l.EndAt)</dd>
+            <dt class="col-4 col-sm-3">時數</dt><dd class="col-8 col-sm-9 fw-semibold">@l.Hours.ToString("0.#") 小時@(l.Hours >= 8 ? $"（{l.Hours / 8:0.##} 天）" : "")</dd>
+            <dt class="col-4 col-sm-3">事由</dt><dd class="col-8 col-sm-9 text-pre">@l.Reason</dd>
+            <dt class="col-4 col-sm-3">職務代理人</dt><dd class="col-8 col-sm-9">@Emp(l.DeputyId)</dd>
+        </dl>
+        break;
+
+    case DocumentType.Overtime when c.Overtime is { } o:
+        <dl class="row mb-0 dl-compact">
+            <dt class="col-4 col-sm-3">加班日期</dt><dd class="col-8 col-sm-9">@o.Date.ToString("yyyy/MM/dd")（@weekdays[(int)o.Date.DayOfWeek]）<span class="badge @(o.IsHoliday ? "text-bg-warning" : "text-bg-light border") ms-1">@(o.IsHoliday ? "休假日" : "工作日")</span></dd>
+            <dt class="col-4 col-sm-3">時段</dt><dd class="col-8 col-sm-9">@o.StartTime.ToString("HH\\:mm") – @o.EndTime.ToString("HH\\:mm")</dd>
+            <dt class="col-4 col-sm-3">時數</dt><dd class="col-8 col-sm-9 fw-semibold">@o.Hours.ToString("0.#") 小時</dd>
+            <dt class="col-4 col-sm-3">補償方式</dt><dd class="col-8 col-sm-9">@o.Compensation.ToDisplay()</dd>
+            <dt class="col-4 col-sm-3">事由</dt><dd class="col-8 col-sm-9 text-pre">@o.Reason</dd>
+        </dl>
+        break;
+
+    case DocumentType.Expense when c.Expense is { } e:
+        <dl class="row mb-2 dl-compact">
+            <dt class="col-4 col-sm-3">報銷事由</dt><dd class="col-8 col-sm-9">@e.Purpose</dd>
+            <dt class="col-4 col-sm-3">付款方式</dt><dd class="col-8 col-sm-9">@e.PaymentMethod.ToDisplay()</dd>
+            @if (!string.IsNullOrEmpty(e.ProjectCode)) { <dt class="col-4 col-sm-3">專案代碼</dt><dd class="col-8 col-sm-9">@e.ProjectCode</dd> }
+        </dl>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0 line-table">
+                <thead class="table-light"><tr><th>#</th><th>日期</th><th>類別</th><th>說明</th><th>發票 / 收據</th><th class="text-end">金額</th></tr></thead>
+                <tbody>
+                    @for (var i = 0; i < e.Items.Count; i++)
+                    {
+                        var it = e.Items[i];
+                        var cat = L.Categories.GetValueOrDefault(it.CategoryId);
+                        var over = cat?.MaxAmountPerItem is decimal max && it.Amount > max;
+                        <tr>
+                            <td data-label="#">@(i + 1)</td>
+                            <td data-label="日期" class="text-nowrap">@it.Date.ToString("MM/dd")</td>
+                            <td data-label="類別">@(cat?.Name ?? "—")</td>
+                            <td data-label="說明">@it.Description</td>
+                            <td data-label="發票 / 收據">@(it.ReceiptNo ?? "—")</td>
+                            <td data-label="金額" class="text-end text-nowrap @(over ? "text-danger fw-semibold" : "")">@it.Amount.ToString("N0")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot><tr class="fw-semibold"><td colspan="5" class="text-end">合計</td><td class="text-end text-nowrap">NT$ @e.TotalAmount.ToString("N0")</td></tr></tfoot>
+            </table>
+        </div>
+        break;
+
+    case DocumentType.Purchase when c.Purchase is { } p:
+        var subject = L.BudgetSubjects.GetValueOrDefault(p.BudgetSubjectId);
+        var supplier = p.SupplierId is int sid ? L.Suppliers.GetValueOrDefault(sid) : null;
+        <dl class="row mb-2 dl-compact">
+            <dt class="col-4 col-sm-3">採購目的</dt><dd class="col-8 col-sm-9 text-pre">@p.Purpose</dd>
+            <dt class="col-4 col-sm-3">預算科目</dt><dd class="col-8 col-sm-9">@(subject is null ? "—" : $"{subject.Code} {subject.Name}")</dd>
+            <dt class="col-4 col-sm-3">建議供應商</dt><dd class="col-8 col-sm-9">@(supplier?.Name ?? "由採購人員決定")</dd>
+            <dt class="col-4 col-sm-3">需求日期</dt><dd class="col-8 col-sm-9">@(p.RequiredDate?.ToString("yyyy/MM/dd") ?? "—")</dd>
+            @if (!string.IsNullOrEmpty(p.DeliveryLocation)) { <dt class="col-4 col-sm-3">交貨地點</dt><dd class="col-8 col-sm-9">@p.DeliveryLocation</dd> }
+        </dl>
+        <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0 line-table">
+                <thead class="table-light"><tr><th>#</th><th>品名</th><th>規格</th><th class="text-end">數量</th><th class="text-end">單價</th><th class="text-end">小計</th></tr></thead>
+                <tbody>
+                    @for (var i = 0; i < p.Items.Count; i++)
+                    {
+                        var it = p.Items[i];
+                        <tr>
+                            <td data-label="#">@(i + 1)</td>
+                            <td data-label="品名">@it.Name</td>
+                            <td data-label="規格" class="small">@(it.Specification ?? "—")</td>
+                            <td data-label="數量" class="text-end text-nowrap">@it.Quantity.ToString("0.##") @it.Unit</td>
+                            <td data-label="單價" class="text-end text-nowrap">@it.UnitPrice.ToString("N0")</td>
+                            <td data-label="小計" class="text-end text-nowrap">@it.Amount.ToString("N0")</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot><tr class="fw-semibold"><td colspan="5" class="text-end">合計</td><td class="text-end text-nowrap">NT$ @p.TotalAmount.ToString("N0")</td></tr></tfoot>
+            </table>
+        </div>
+        break;
+
+    default:
+        <p class="text-body-secondary small mb-0">尚未填寫表單內容。</p>
+        break;
+}

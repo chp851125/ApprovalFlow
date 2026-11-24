@@ -1,0 +1,138 @@
+@model ReportIndexViewModel
+@using ApprovalFlow.Application.Reports
+@{
+    ViewData["Title"] = "報表";
+    var f = Model.Filter;
+    var t = Model.Table;
+    var cur = Model.Current;
+    string Cell(object? v, ReportColumn c) => v switch
+    {
+        null => "",
+        decimal m when c.Kind == ColumnKind.Money => m.ToString("N0"),
+        decimal m when c.Kind == ColumnKind.Percent => m.ToString("0.#") + "%",
+        decimal m => m == 0 ? "0" : m.ToString("#,##0.#"),
+        int i => i.ToString("N0"),
+        DateTimeOffset d => c.Kind == ColumnKind.Date ? d.ToString("yyyy/MM/dd") : d.ToString("yyyy/MM/dd HH:mm"),
+        DateOnly d => d.ToString("yyyy/MM/dd"),
+        _ => v.ToString() ?? ""
+    };
+    bool IsNum(ReportColumn c) => c.Kind is ColumnKind.Money or ColumnKind.Number or ColumnKind.Integer or ColumnKind.Percent;
+    var exportQuery = new Dictionary<string, string?>
+    {
+        ["report"] = f.Report, ["year"] = f.Year?.ToString(), ["from"] = f.From?.ToString("yyyy-MM-dd"), ["to"] = f.To?.ToString("yyyy-MM-dd"),
+        ["type"] = f.Type?.ToString(), ["status"] = f.Status?.ToString(), ["departmentId"] = f.DepartmentId?.ToString()
+    };
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">報表</h1>
+        <div class="text-body-secondary small">可先在頁面預覽，再匯出 Excel（.xlsx）。匯出動作會記錄在稽核紀錄。</div>
+    </div>
+</div>
+
+<div class="box-tabs mb-3">
+    @foreach (var r in Model.Reports)
+    {
+        <a class="box-tab @(r.Key == f.Report ? "active" : "")" asp-action="Index" asp-route-report="@r.Key"><i class="bi @r.Icon"></i><span>@r.Name</span></a>
+    }
+</div>
+
+<form method="get" asp-action="Index" class="card mb-3">
+    <input type="hidden" name="report" value="@f.Report" />
+    <div class="card-body row g-2 align-items-end">
+        @if (cur.UsesYear)
+        {
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1" for="year">年度</label>
+                <select class="form-select" id="year" name="year">
+                    @foreach (var y in Model.Years) { <option value="@y" selected="@(y == f.Year)">@y</option> }
+                </select>
+            </div>
+        }
+        @if (cur.UsesRange)
+        {
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1" for="from">起</label>
+                <input type="date" class="form-control" id="from" name="from" value="@f.From?.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1" for="to">迄</label>
+                <input type="date" class="form-control" id="to" name="to" value="@f.To?.ToString("yyyy-MM-dd")" />
+            </div>
+        }
+        @if (cur.UsesType)
+        {
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1" for="type">單別</label>
+                <select class="form-select" id="type" name="type">
+                    <option value="">全部</option>
+                    @foreach (var ty in Model.AllowedTypes) { <option value="@ty" selected="@(ty == f.Type)">@ty.ToDisplay()</option> }
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1" for="status">狀態</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">全部</option>
+                    @foreach (var s in Enum.GetValues<DocumentStatus>().Where(s => s != DocumentStatus.Draft)) { <option value="@s" selected="@(s == f.Status)">@s.ToDisplay()</option> }
+                </select>
+            </div>
+        }
+        @if (f.Report != "approvers")
+        {
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1" for="departmentId">部門（含下層）</label>
+                <select class="form-select" id="departmentId" name="departmentId" asp-items="Model.Departments">
+                    <option value="">全部</option>
+                </select>
+            </div>
+        }
+        <div class="col-12 col-md d-flex gap-2 justify-content-md-end">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-funnel me-1"></i>查詢</button>
+            <a class="btn btn-success" href="@Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(Url.Action("Export")!, exportQuery.Where(kv => !string.IsNullOrEmpty(kv.Value)))"><i class="bi bi-file-earmark-excel me-1"></i>匯出 Excel</a>
+        </div>
+    </div>
+</form>
+
+<div class="card">
+    <div class="card-header">
+        <div class="fw-semibold">@t.Title</div>
+        <div class="small text-body-secondary">@t.Subtitle@(t.Rows.Count > Model.PreviewRows ? $"・頁面僅預覽前 {Model.PreviewRows} 筆，完整資料請匯出" : "")</div>
+    </div>
+    @if (t.Rows.Count == 0)
+    {
+        <div class="card-body empty-state py-5">
+            <div class="empty-state-icon"><i class="bi bi-table"></i></div>
+            <p class="text-body-secondary mb-0">沒有符合條件的資料</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive report-table-wrap">
+            <table class="table table-sm table-hover table-bordered align-middle mb-0 report-table">
+                <thead class="table-light">
+                    <tr>@foreach (var c in t.Columns) { <th class="@(IsNum(c) ? "text-end" : "") text-nowrap">@c.Header</th> }</tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in t.Rows.Take(Model.PreviewRows))
+                    {
+                        <tr>
+                            @for (var i = 0; i < t.Columns.Count; i++)
+                            {
+                                var c = t.Columns[i];
+                                <td class="@(IsNum(c) ? "text-end text-nowrap" : "") @(c.Width >= 40 ? "cell-wide" : "")">@Cell(r[i], c)</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+                @if (t.Totals is { } tot)
+                {
+                    <tfoot>
+                        <tr class="fw-semibold table-light">
+                            @for (var i = 0; i < t.Columns.Count; i++) { <td class="@(IsNum(t.Columns[i]) ? "text-end text-nowrap" : "")">@Cell(tot[i], t.Columns[i])</td> }
+                        </tr>
+                    </tfoot>
+                }
+            </table>
+        </div>
+    }
+</div>

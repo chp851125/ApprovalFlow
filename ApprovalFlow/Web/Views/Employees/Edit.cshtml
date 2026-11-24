@@ -1,0 +1,116 @@
+@model EmployeeEditViewModel
+@{
+    ViewData["Title"] = Model.IsNew ? "新增員工" : "編輯員工資料";
+}
+<div class="page-header">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb small mb-1">
+                <li class="breadcrumb-item"><a asp-action="Index">員工帳號</a></li>
+                @if (!Model.IsNew)
+                {
+                    <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.Input.Id">@Model.Input.Name</a></li>
+                }
+                <li class="breadcrumb-item active">@ViewData["Title"]</li>
+            </ol>
+        </nav>
+        <h1 class="page-title">@ViewData["Title"]</h1>
+    </div>
+</div>
+
+<form method="post" asp-action="Save" novalidate>
+    <input type="hidden" asp-for="Input.Id" />
+    <input type="hidden" asp-for="Input.Version" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger small" role="alert"></div>
+
+    <div class="card form-card mb-3">
+        <div class="card-header fw-semibold"><i class="bi bi-person-vcard me-2"></i>基本資料</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-sm-4">
+                    <label asp-for="Input.EmployeeNo" class="form-label required"></label>
+                    <input asp-for="Input.EmployeeNo" class="form-control text-uppercase" maxlength="12" />
+                    <span asp-validation-for="Input.EmployeeNo" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-sm-4">
+                    <label asp-for="Input.Name" class="form-label required"></label>
+                    <input asp-for="Input.Name" class="form-control" maxlength="20" />
+                    <span asp-validation-for="Input.Name" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-sm-4">
+                    <label asp-for="Input.Account" class="form-label required"></label>
+                    <input asp-for="Input.Account" class="form-control" maxlength="30" autocomplete="off" />
+                    @if (!Model.IsNew) { <div class="form-text">變更帳號會讓此人目前的登入失效。</div> }
+                    <span asp-validation-for="Input.Account" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-sm-6">
+                    <label asp-for="Input.Email" class="form-label required"></label>
+                    <input asp-for="Input.Email" class="form-control" type="email" maxlength="100" />
+                    <span asp-validation-for="Input.Email" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-sm-3 col-6">
+                    <label asp-for="Input.Phone" class="form-label"></label>
+                    <input asp-for="Input.Phone" class="form-control" type="tel" maxlength="20" />
+                    <span asp-validation-for="Input.Phone" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-sm-3 col-6">
+                    <label asp-for="Input.Extension" class="form-label"></label>
+                    <input asp-for="Input.Extension" class="form-control" inputmode="numeric" maxlength="10" />
+                    <span asp-validation-for="Input.Extension" class="invalid-feedback d-block"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card form-card mb-3">
+        <div class="card-header fw-semibold"><i class="bi bi-diagram-3 me-2"></i>組織與簽核關係</div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-sm-6">
+                    <label asp-for="Input.DepartmentId" class="form-label required"></label>
+                    <select asp-for="Input.DepartmentId" asp-items="Model.Departments" class="form-select">
+                        <option value="0">請選擇</option>
+                    </select>
+                    <span asp-validation-for="Input.DepartmentId" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-sm-6">
+                    <label asp-for="Input.JobTitleId" class="form-label required"></label>
+                    <select asp-for="Input.JobTitleId" asp-items="Model.JobTitles" class="form-select">
+                        <option value="0">請選擇</option>
+                    </select>
+                    <span asp-validation-for="Input.JobTitleId" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-sm-6">
+                    <label asp-for="Input.ManagerId" class="form-label"></label>
+                    <select asp-for="Input.ManagerId" asp-items="Model.Managers" class="form-select">
+                        <option value="">（無）</option>
+                    </select>
+                    <div class="form-text">「直屬主管」與「上 N 級主管」關卡依此欄位往上追溯。</div>
+                    <span asp-validation-for="Input.ManagerId" class="invalid-feedback d-block"></span>
+                </div>
+                <div class="col-sm-6">
+                    <label asp-for="Input.HireDate" class="form-label required"></label>
+                    <input asp-for="Input.HireDate" class="form-control" type="date" />
+                    <div class="form-text">特休額度依到職日計算。</div>
+                    <span asp-validation-for="Input.HireDate" class="invalid-feedback d-block"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.IsNew)
+    {
+        <div class="card form-card mb-3">
+            <div class="card-header fw-semibold"><i class="bi bi-shield-check me-2"></i>角色</div>
+            <div class="card-body">
+                <partial name="_RoleCheckboxes" model="@(new RoleCheckboxModel("Input.Roles", Model.Input.Roles, Model.CanAssignAdmin))" />
+                <div class="form-text mt-2">建立後系統會產生一組臨時密碼，員工第一次登入時必須變更。</div>
+            </div>
+        </div>
+    }
+
+    <div class="form-actions">
+        <a asp-action="@(Model.IsNew ? "Index" : "Details")" asp-route-id="@(Model.IsNew ? null : Model.Input.Id)" class="btn btn-outline-secondary">取消</a>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>@(Model.IsNew ? "建立帳號" : "儲存")</button>
+    </div>
+</form>

@@ -1,0 +1,117 @@
+@model LayoutUser?
+@inject LayoutService LayoutData
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+    string Active(string c, string? a = null) =>
+        string.Equals(controller, c, StringComparison.OrdinalIgnoreCase) &&
+        (a == null || string.Equals(action, a, StringComparison.OrdinalIgnoreCase)) ? "active" : "";
+    var isAdmin = User.IsInRole(Roles.Admin);
+    var isHr = isAdmin || User.IsInRole(Roles.HR);
+    var isFinance = isAdmin || User.IsInRole(Roles.Finance);
+    var counts = await LayoutData.GetCountsAsync();
+    var isDocs = string.Equals(controller, "Documents", StringComparison.OrdinalIgnoreCase);
+    var box = (Context.Request.Query["box"].ToString() is { Length: > 0 } b ? b : "todo").ToLowerInvariant();
+    string BoxActive(string key) => isDocs && action == "Index" && box == key ? "active" : "";
+}
+<nav class="app-nav" aria-label="主選單">
+    <div class="app-nav-section">工作區</div>
+    <a class="app-nav-link @Active("Home", "Index")" asp-controller="Home" asp-action="Index">
+        <i class="bi bi-house-door"></i><span>首頁</span>
+    </a>
+    <a class="app-nav-link @Active("Dashboard")" asp-controller="Dashboard" asp-action="Index">
+        <i class="bi bi-bar-chart-line"></i><span>儀表板</span>
+    </a>
+    <a class="app-nav-link @(isDocs && action is "New" or "Create" ? "active" : "")" asp-controller="Documents" asp-action="New">
+        <i class="bi bi-plus-circle"></i><span>新增申請</span>
+    </a>
+
+    <div class="app-nav-section">簽核</div>
+    <a class="app-nav-link @BoxActive("todo")" asp-controller="Documents" asp-action="Index" asp-route-box="todo">
+        <i class="bi bi-inbox"></i><span>待我簽核</span>
+        @if (counts.Todo > 0) { <span class="badge rounded-pill text-bg-danger">@counts.Todo</span> }
+    </a>
+    <a class="app-nav-link @BoxActive("done")" asp-controller="Documents" asp-action="Index" asp-route-box="done">
+        <i class="bi bi-check2-square"></i><span>已辦</span>
+    </a>
+    <a class="app-nav-link @BoxActive("mine")" asp-controller="Documents" asp-action="Index" asp-route-box="mine">
+        <i class="bi bi-send"></i><span>我的申請</span>
+    </a>
+    <a class="app-nav-link @BoxActive("drafts")" asp-controller="Documents" asp-action="Index" asp-route-box="drafts">
+        <i class="bi bi-pencil-square"></i><span>草稿 / 待修改</span>
+        @if (counts.Drafts > 0) { <span class="badge rounded-pill text-bg-secondary">@counts.Drafts</span> }
+    </a>
+    <a class="app-nav-link @BoxActive("cc")" asp-controller="Documents" asp-action="Index" asp-route-box="cc">
+        <i class="bi bi-envelope-paper"></i><span>抄送給我</span>
+    </a>
+
+    <div class="app-nav-section">個人設定</div>
+    <a class="app-nav-link @Active("Notifications")" asp-controller="Notifications" asp-action="Index">
+        <i class="bi bi-bell"></i><span>通知中心</span>
+    </a>
+    <a class="app-nav-link @Active("Delegations")" asp-controller="Delegations" asp-action="Index">
+        <i class="bi bi-person-check"></i><span>代理人設定</span>
+    </a>
+    <a class="app-nav-link @Active("Account", "ChangePassword")" asp-controller="Account" asp-action="ChangePassword">
+        <i class="bi bi-key"></i><span>變更密碼</span>
+    </a>
+
+    @if (isHr)
+    {
+        <div class="app-nav-section">組織管理</div>
+        <a class="app-nav-link @Active("Organization")" asp-controller="Organization" asp-action="Index">
+            <i class="bi bi-diagram-3"></i><span>組織架構</span>
+        </a>
+        <a class="app-nav-link @Active("Employees")" asp-controller="Employees" asp-action="Index">
+            <i class="bi bi-people"></i><span>員工帳號</span>
+        </a>
+    }
+
+    @if (isHr || isFinance)
+    {
+        <div class="app-nav-section">基本資料</div>
+        @if (isHr)
+        {
+            <a class="app-nav-link @Active("LeaveTypes")" asp-controller="LeaveTypes" asp-action="Index">
+                <i class="bi bi-calendar2-heart"></i><span>假別設定</span>
+            </a>
+            <a class="app-nav-link @Active("Holidays")" asp-controller="Holidays" asp-action="Index">
+                <i class="bi bi-calendar3"></i><span>假日行事曆</span>
+            </a>
+        }
+        @if (isFinance)
+        {
+            <a class="app-nav-link @Active("ExpenseCategories")" asp-controller="ExpenseCategories" asp-action="Index">
+                <i class="bi bi-tags"></i><span>費用類別</span>
+            </a>
+        }
+    }
+
+    @if (isHr || isFinance)
+    {
+        <div class="app-nav-section">分析</div>
+        <a class="app-nav-link @Active("Reports")" asp-controller="Reports" asp-action="Index">
+            <i class="bi bi-file-earmark-spreadsheet"></i><span>報表</span>
+        </a>
+    }
+
+    @if (isAdmin)
+    {
+        <div class="app-nav-section">系統管理</div>
+        <a class="app-nav-link @Active("WorkflowTemplates")" asp-controller="WorkflowTemplates" asp-action="Index">
+            <i class="bi bi-diagram-2"></i><span>簽核流程</span>
+        </a>
+        <a class="app-nav-link @Active("Scheduler")" asp-controller="Scheduler" asp-action="Index">
+            <i class="bi bi-stopwatch"></i><span>排程與通知</span>
+        </a>
+        <a class="app-nav-link @Active("Settings")" asp-controller="Settings" asp-action="Index">
+            <i class="bi bi-sliders"></i><span>系統參數</span>
+        </a>
+        <a class="app-nav-link @Active("AuditLogs")" asp-controller="AuditLogs" asp-action="Index">
+            <i class="bi bi-journal-text"></i><span>稽核紀錄</span>
+        </a>
+        <a class="app-nav-link @Active("Maintenance")" asp-controller="Maintenance" asp-action="Index">
+            <i class="bi bi-database-gear"></i><span>資料維護</span>
+        </a>
+    }
+</nav>

@@ -1,0 +1,97 @@
+@model HolidayIndexViewModel
+@{
+    ViewData["Title"] = "假日行事曆";
+    var weekdays = "日一二三四五六";
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">假日行事曆</h1>
+        <div class="text-body-secondary small">週六、週日預設為休假日，這裡只需設定國定假日與補班日。工作日用於計算請假時數與簽核時效（SLA）。</div>
+    </div>
+    <form method="get" asp-action="Index" class="d-flex align-items-center gap-2">
+        <label class="small text-nowrap" for="year">年度</label>
+        <select class="form-select js-autosubmit" id="year" name="year">
+            @foreach (var y in Model.Years)
+            {
+                <option value="@y" selected="@(y == Model.Year)">@y</option>
+            }
+        </select>
+    </form>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-semibold"><i class="bi bi-calendar3 me-2"></i>@Model.Year 年特殊日（@Model.Holidays.Count）</span>
+                <span class="small text-body-secondary">全年工作日 @Model.WorkdayCount 天</span>
+            </div>
+            @if (Model.Holidays.Count == 0)
+            {
+                <div class="card-body empty-state py-5">
+                    <div class="empty-state-icon"><i class="bi bi-calendar-x"></i></div>
+                    <p class="text-body-secondary mb-0">@Model.Year 年尚未設定任何假日</p>
+                </div>
+            }
+            else
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var h in Model.Holidays)
+                    {
+                        var isMakeup = h.Type == HolidayType.MakeupWorkday;
+                        <li class="list-group-item d-flex align-items-center gap-3">
+                            <div class="date-chip @(isMakeup ? "date-chip-work" : "")">
+                                <span class="date-chip-m">@h.Date.Month 月</span>
+                                <span class="date-chip-d">@h.Date.Day</span>
+                            </div>
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="fw-semibold">@h.Name</div>
+                                <div class="small text-body-secondary">
+                                    @h.Date.ToString("yyyy/MM/dd")（@weekdays[(int)h.Date.DayOfWeek]）
+                                    <span class="badge @(isMakeup ? "text-bg-warning" : "text-bg-danger-subtle text-danger-emphasis") ms-1">@h.Type.ToDisplay()</span>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-1 flex-shrink-0">
+                                <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@h.Id" title="編輯"><i class="bi bi-pencil"></i></a>
+                                <form method="post" asp-action="Delete" data-confirm="確定要刪除「@h.Date.ToString("yyyy/MM/dd") @h.Name」嗎？">
+                                    <input type="hidden" name="id" value="@h.Id" />
+                                    <input type="hidden" name="year" value="@Model.Year" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="刪除"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header fw-semibold"><i class="bi bi-plus-circle me-2"></i>新增特殊日</div>
+            <div class="card-body">
+                <form method="post" asp-action="Create" novalidate>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small" role="alert"></div>
+                    <div class="mb-3">
+                        <label asp-for="NewHoliday.Date" class="form-label required"></label>
+                        <input asp-for="NewHoliday.Date" type="date" class="form-control" />
+                        <span asp-validation-for="NewHoliday.Date" class="invalid-feedback d-block"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="NewHoliday.Name" class="form-label required"></label>
+                        <input asp-for="NewHoliday.Name" class="form-control" maxlength="30" placeholder="例：中秋節、颱風假" />
+                        <span asp-validation-for="NewHoliday.Name" class="invalid-feedback d-block"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="NewHoliday.Type" class="form-label"></label>
+                        <select asp-for="NewHoliday.Type" class="form-select">
+                            <option value="@HolidayType.Holiday">@HolidayType.Holiday.ToDisplay()（平日放假）</option>
+                            <option value="@HolidayType.MakeupWorkday">@HolidayType.MakeupWorkday.ToDisplay()（週末上班）</option>
+                        </select>
+                        <span asp-validation-for="NewHoliday.Type" class="invalid-feedback d-block"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-plus-lg me-1"></i>新增</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

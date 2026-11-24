@@ -1,0 +1,98 @@
+[
+  {
+    "code": "TRAFFIC",
+    "name": "交通費",
+    "budgetSubjectId": 1,
+    "maxAmountPerItem": 5000,
+    "requiresReceipt": true,
+    "description": "高鐵、計程車、停車費、油資等",
+    "sortOrder": 1,
+    "isActive": true,
+    "id": 1,
+    "version": 1
+  },
+  {
+    "code": "LODGING",
+    "name": "差旅住宿",
+    "budgetSubjectId": 1,
+    "maxAmountPerItem": 4000,
+    "requiresReceipt": true,
+    "description": "出差住宿，每晚上限 4,000 元",
+    "sortOrder": 2,
+    "isActive": true,
+    "id": 2,
+    "version": 1
+  },
+  {
+    "code": "MEAL",
+    "name": "誤餐費",
+    "budgetSubjectId": 1,
+    "maxAmountPerItem": 500,
+    "requiresReceipt": false,
+    "description": "加班或出差誤餐，每餐上限 500 元",
+    "sortOrder": 3,
+    "isActive": true,
+    "id": 3,
+    "version": 1
+  },
+  {
+    "code": "ENTERTAIN",
+    "name": "交際費",
+    "budgetSubjectId": 2,
+    "maxAmountPerItem": 20000,
+    "requiresReceipt": true,
+    "description": "客戶餐敘、禮品，須註明對象",
+    "sortOrder": 4,
+    "isActive": true,
+    "id": 4,
+    "version": 1
+  },
+  {
+    "code": "STATIONERY",
+    "name": "文具用品",
+    "budgetSubjectId": 3,
+    "maxAmountPerItem": null,
+    "requiresReceipt": true,
+    "description": "辦公文具、紙張",
+    "sortOrder": 5,
+    "isActive": true,
+    "id": 5,
+    "version": 1
+  },
+  {
+    "code": "POSTAGE",
+    "name": "郵電費",
+    "budgetSubjectId": 4,
+    "maxAmountPerItem": null,
+    "requiresReceipt": true,
+    "description": "郵資、快遞、電話費",
+    "sortOrder": 6,
+    "isActive": true,
+    "id": 6,
+    "version": 1
+  },
+  {
+    "code": "TRAINING",
+    "name": "教育訓練",
+    "budgetSubjectId": 5,
+    "maxAmountPerItem": 30000,
+    "requiresReceipt": true,
+    "description": "外部課程、研討會報名費",
+    "sortOrder": 7,
+    "isActive": true,
+    "id": 7,
+    "version": 1
+  },
+  {
+    "code": "MISC",
+    "name": "雜項支出",
+    "budgetSubjectId": 6,
+    "maxAmountPerItem": 10000,
+    "requiresReceipt": true,
+    "description": "其他零星支出",
+    "sortOrder": 8,
+    "isActive": true,
+    "id": 8,
+    "version": 1
+  }
+]

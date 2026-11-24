@@ -1,0 +1,96 @@
+@model (WorkflowStepInput Step, string Index, IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> Employees)
+@{
+    var s = Model.Step;
+    var i = Model.Index;
+    var p = $"Steps[{i}]";
+    var src = s.ApproverSource;
+    string Hide(params ApproverSource[] show) => show.Contains(src) ? "" : "d-none";
+}
+<div class="card step-row mb-3" data-step-row>
+    <div class="card-header d-flex align-items-center gap-2 py-2">
+        <span class="step-no badge text-bg-primary" data-step-no>@(int.TryParse(i, out var n) ? n + 1 : 0)</span>
+        <input class="form-control form-control-sm fw-semibold" name="@(p).Name" value="@s.Name" maxlength="30" placeholder="關卡名稱，例：直屬主管" aria-label="關卡名稱" required />
+        <div class="btn-group btn-group-sm flex-shrink-0" role="group" aria-label="關卡操作">
+            <button type="button" class="btn btn-outline-secondary" data-step-up title="上移"><i class="bi bi-arrow-up"></i></button>
+            <button type="button" class="btn btn-outline-secondary" data-step-down title="下移"><i class="bi bi-arrow-down"></i></button>
+            <button type="button" class="btn btn-outline-danger" data-step-remove title="刪除"><i class="bi bi-trash"></i></button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row g-2">
+            <div class="col-sm-6 col-lg-4">
+                <label class="form-label small mb-1">簽核人來源</label>
+                <select class="form-select form-select-sm" name="@(p).ApproverSource" data-step-source>
+                    @foreach (var v in Enum.GetValues<ApproverSource>())
+                    {
+                        <option value="@v" selected="@(v == src)">@v.ToDisplay()</option>
+                    }
+                </select>
+            </div>
+            <div class="col-sm-6 col-lg-4 @Hide(ApproverSource.Role)" data-for-source="Role">
+                <label class="form-label small mb-1">角色</label>
+                <select class="form-select form-select-sm" name="@(p).RoleName">
+                    @foreach (var r in Roles.All.Where(r => r != Roles.Applicant))
+                    {
+                        <option value="@r" selected="@(r == s.RoleName)">@Roles.ToDisplay(r)</option>
+                    }
+                </select>
+            </div>
+            <div class="col-sm-6 col-lg-4 @Hide(ApproverSource.ManagerLevelN)" data-for-source="ManagerLevelN">
+                <label class="form-label small mb-1">往上幾級</label>
+                <input class="form-control form-control-sm" type="number" min="1" max="5" name="@(p).Levels" value="@s.Levels" />
+            </div>
+            <div class="col-12 col-lg-8 @Hide(ApproverSource.SpecificUser)" data-for-source="SpecificUser">
+                <label class="form-label small mb-1">指定人員（可複選，按住 Ctrl 選多位）</label>
+                <select class="form-select form-select-sm" name="@(p).UserIds" multiple size="4">
+                    @foreach (var e in Model.Employees)
+                    {
+                        <option value="@e.Value" selected="@s.UserIds.Contains(int.Parse(e.Value))">@e.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-sm-6 col-lg-4 @Hide(ApproverSource.Role, ApproverSource.SpecificUser)" data-for-source="Role SpecificUser">
+                <label class="form-label small mb-1">多人時的簽核方式</label>
+                <select class="form-select form-select-sm" name="@(p).Mode">
+                    <option value="@ApprovalMode.Any" selected="@(s.Mode is ApprovalMode.Any or ApprovalMode.Single)">或簽（任一人同意即可）</option>
+                    <option value="@ApprovalMode.All" selected="@(s.Mode == ApprovalMode.All)">會簽（全部同意）</option>
+                </select>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <label class="form-label small mb-1">時效（工作小時）</label>
+                <input class="form-control form-control-sm" type="number" min="1" max="240" name="@(p).SlaHours" value="@s.SlaHours" placeholder="空白＝系統預設" />
+            </div>
+        </div>
+        <div class="row g-2 align-items-end mt-1">
+            <div class="col-12 col-md-auto">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" name="@(p).HasCondition" value="true" id="cond-@i" checked="@s.HasCondition" data-step-condition />
+                    <input type="hidden" name="@(p).HasCondition" value="false" />
+                    <label class="form-check-label small" for="cond-@i">符合條件才經過此關</label>
+                </div>
+            </div>
+            <div class="col-12 col-md d-flex gap-2 @(s.HasCondition ? "" : "d-none")" data-condition-fields>
+                <select class="form-select form-select-sm" name="@(p).ConditionField" aria-label="條件欄位">
+                    @foreach (var f in Enum.GetValues<ConditionField>())
+                    {
+                        <option value="@f" selected="@(f == s.ConditionField)">@f.ToDisplay()</option>
+                    }
+                </select>
+                <select class="form-select form-select-sm w-auto" name="@(p).ConditionOperator" aria-label="比較方式">
+                    @foreach (var o in Enum.GetValues<ConditionOperator>())
+                    {
+                        <option value="@o" selected="@(o == s.ConditionOperator)">@o.ToSymbol()</option>
+                    }
+                </select>
+                <input class="form-control form-control-sm" type="number" min="0" step="0.5" name="@(p).ConditionValue" value="@s.ConditionValue.ToString("0.##")" aria-label="條件值" />
+            </div>
+            <div class="col-12 col-md-auto">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" name="@(p).AllowWithdraw" value="true" id="wd-@i" checked="@s.AllowWithdraw" />
+                    <input type="hidden" name="@(p).AllowWithdraw" value="false" />
+                    <label class="form-check-label small" for="wd-@i">此關可撤回</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

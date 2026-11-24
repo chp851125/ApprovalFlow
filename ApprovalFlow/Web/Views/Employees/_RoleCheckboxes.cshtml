@@ -1,0 +1,39 @@
+@model RoleCheckboxModel
+@{
+    var descriptions = new Dictionary<string, string>
+    {
+        [Roles.Applicant] = "可提出各類申請（每位員工必備）",
+        [Roles.Manager] = "主管，可檢視部屬單據",
+        [Roles.DeptManager] = "部門經理",
+        [Roles.Finance] = "財務審核、費用類別維護",
+        [Roles.HR] = "人事管理、員工帳號、假別與行事曆",
+        [Roles.Admin] = "系統管理員，可維護所有設定"
+    };
+}
+<div class="row g-2">
+    @foreach (var r in Roles.All)
+    {
+        var id = $"role_{r}";
+        var isApplicant = r == Roles.Applicant;
+        var locked = isApplicant || (r == Roles.Admin && !Model.CanAssignAdmin);
+        var isChecked = isApplicant || Model.Selected.Contains(r);
+        <div class="col-sm-6 col-lg-4">
+            <div class="form-check role-option border rounded-3 p-2 ps-5 h-100 @(locked ? "bg-body-tertiary" : "")">
+                <input class="form-check-input" type="checkbox" id="@id" name="@Model.FieldName" value="@r" checked="@isChecked" disabled="@locked" />
+                @if (locked && isChecked)
+                {
+                    @* disabled 欄位不會送出，以 hidden 補上 *@
+                    <input type="hidden" name="@Model.FieldName" value="@r" />
+                }
+                <label class="form-check-label d-block" for="@id">
+                    <span class="fw-semibold">@Roles.ToDisplay(r)</span>
+                    <span class="d-block small text-body-secondary">@descriptions.GetValueOrDefault(r)</span>
+                </label>
+            </div>
+        </div>
+    }
+</div>
+@if (!Model.CanAssignAdmin)
+{
+    <div class="form-text"><i class="bi bi-info-circle"></i> 「系統管理員」角色只能由系統管理員指派。</div>
+}

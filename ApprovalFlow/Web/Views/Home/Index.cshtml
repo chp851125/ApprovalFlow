@@ -1,0 +1,153 @@
+﻿@model HomeViewModel
+@{
+    ViewData["Title"] = "首頁";
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">@Model.Greeting，@Model.UserName</h1>
+        <div class="text-body-secondary small">@Model.TodayText</div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-inbox"></i></div>
+            <div><div class="stat-value">@Model.PendingCount</div><div class="stat-label">待我簽核</div></div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-hourglass-split"></i></div>
+            <div><div class="stat-value">@Model.InProgressCount</div><div class="stat-label">我的簽核中</div></div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon bg-warning-subtle text-warning-emphasis"><i class="bi bi-pencil-square"></i></div>
+            <div><div class="stat-value">@Model.DraftCount</div><div class="stat-label">草稿 / 待修改</div></div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-check2-circle"></i></div>
+            <div><div class="stat-value">@Model.ApprovedThisMonth</div><div class="stat-label">本月已核准</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-8 d-flex flex-column gap-3">
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <i class="bi bi-inbox me-2"></i><span class="fw-semibold">待我簽核</span>
+                <span class="badge text-bg-danger ms-2">@Model.PendingCount</span>
+                <a class="ms-auto small" asp-controller="Documents" asp-action="Index" asp-route-box="todo">查看全部 <i class="bi bi-chevron-right"></i></a>
+            </div>
+            @if (Model.PendingDocuments.Count == 0)
+            {
+                <div class="card-body small text-body-secondary"><i class="bi bi-check2-circle text-success me-1"></i>目前沒有待簽核的單據。</div>
+            }
+            else
+            {
+                <div class="list-group list-group-flush">
+                    @foreach (var d in Model.PendingDocuments)
+                    {
+                        <a class="list-group-item list-group-item-action doc-row" asp-controller="Documents" asp-action="Details" asp-route-id="@d.Id">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div class="min-w-0">
+                                    <div class="small text-body-secondary">@d.Type.ToDisplay()・@d.DocumentNo・@d.CurrentStep</div>
+                                    <div class="fw-semibold text-truncate">@d.Title</div>
+                                </div>
+                                <div class="text-end flex-shrink-0">
+                                    <span class="badge @d.Status.ToBadgeClass()">@d.Status.ToDisplay()</span>
+                                    <div class="small text-body-secondary mt-1">期限 @d.UpdatedAt.ToString("MM/dd HH:mm")</div>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+        <div class="card">
+            <div class="card-header d-flex align-items-center">
+                <i class="bi bi-clock-history me-2"></i><span class="fw-semibold">我最近的申請</span>
+                <a class="ms-auto small" asp-controller="Documents" asp-action="Index" asp-route-box="mine">查看全部 <i class="bi bi-chevron-right"></i></a>
+            </div>
+            @if (Model.RecentDocuments.Count == 0)
+            {
+                <div class="card-body empty-state py-4">
+                    <div class="empty-state-icon"><i class="bi bi-file-earmark"></i></div>
+                    <p class="text-body-secondary mb-0">目前沒有申請紀錄</p>
+                </div>
+            }
+            else
+            {
+                <div class="list-group list-group-flush">
+                    @foreach (var d in Model.RecentDocuments)
+                    {
+                        <a class="list-group-item list-group-item-action doc-row" asp-controller="Documents" asp-action="Details" asp-route-id="@d.Id">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <div class="min-w-0">
+                                    <div class="small text-body-secondary">
+                                        @d.Type.ToDisplay()・@(string.IsNullOrEmpty(d.DocumentNo) ? "（尚未送出）" : d.DocumentNo)
+                                    </div>
+                                    <div class="fw-semibold text-truncate">@d.Title</div>
+                                    @if (d.CurrentStep != null)
+                                    {
+                                        <div class="small text-body-secondary"><i class="bi bi-signpost-2"></i> 目前關卡：@d.CurrentStep</div>
+                                    }
+                                </div>
+                                <div class="text-end flex-shrink-0">
+                                    <span class="badge @d.Status.ToBadgeClass()">@d.Status.ToDisplay()</span>
+                                    <div class="small text-body-secondary mt-1">@d.UpdatedAt.ToString("MM/dd HH:mm")</div>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+    <div class="col-lg-4 d-flex flex-column gap-3">
+        <div class="card">
+            <div class="card-header fw-semibold"><i class="bi bi-person-check me-2"></i>代理設定</div>
+            @if (Model.ActiveDelegations.Count == 0)
+            {
+                <div class="card-body small text-body-secondary">目前沒有生效中或即將生效的代理設定。</div>
+            }
+            else
+            {
+                <ul class="list-group list-group-flush small">
+                    @foreach (var d in Model.ActiveDelegations)
+                    {
+                        <li class="list-group-item">
+                            <div>
+                                <span class="fw-semibold">@Model.EmployeeNames.GetValueOrDefault(d.PrincipalId)</span>
+                                <i class="bi bi-arrow-right mx-1"></i>
+                                <span class="fw-semibold">@Model.EmployeeNames.GetValueOrDefault(d.DelegateId)</span>
+                            </div>
+                            <div class="text-body-secondary">@d.StartDate.ToString("yyyy/MM/dd") ～ @d.EndDate.ToString("yyyy/MM/dd")・@d.Reason</div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+        <div class="card">
+            <div class="card-header fw-semibold"><i class="bi bi-calendar-event me-2"></i>近期假日</div>
+            <ul class="list-group list-group-flush small">
+                @foreach (var h in Model.UpcomingHolidays)
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>@h.Name</span>
+                        <span class="text-body-secondary">@h.Date.ToString("MM/dd")（@("日一二三四五六"[(int)h.Date.DayOfWeek])）</span>
+                    </li>
+                }
+                @if (Model.UpcomingHolidays.Count == 0)
+                {
+                    <li class="list-group-item text-body-secondary">行事曆中沒有後續假日</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

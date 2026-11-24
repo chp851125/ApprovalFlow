@@ -1,0 +1,105 @@
+@model AuditIndexViewModel
+@{
+    ViewData["Title"] = "稽核紀錄";
+    var f = Model.Filter;
+    var exportQuery = Model.Pager.RouteValues.Where(kv => !string.IsNullOrEmpty(kv.Value));
+    string ActionBadge(string a) => a switch
+    {
+        "LoginFailed" or "AccountLocked" or "Delete" or "Disable" or "ResetData" => "text-bg-danger",
+        "Login" or "Logout" => "text-bg-light border",
+        "Create" or "Enable" or "Activate" => "text-bg-success",
+        "Export" or "RunJob" => "text-bg-info",
+        _ when a.StartsWith("Workflow") => "text-bg-primary",
+        _ => "text-bg-secondary"
+    };
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">稽核紀錄</h1>
+        <div class="text-body-secondary small">登入、資料異動、簽核動作、匯出與系統排程都會留下紀錄；資料異動會記錄欄位前後值。</div>
+    </div>
+    <a class="btn btn-success" href="@Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(Url.Action("Export")!, exportQuery)"><i class="bi bi-file-earmark-excel me-1"></i>匯出 Excel</a>
+</div>
+
+<form method="get" asp-action="Index" class="card mb-3">
+    <div class="card-body row g-2 align-items-end">
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-1" for="from">起</label>
+            <input type="date" class="form-control" id="from" name="from" value="@f.From?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-1" for="to">迄</label>
+            <input type="date" class="form-control" id="to" name="to" value="@f.To?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-1" for="user">使用者</label>
+            <input class="form-control" id="user" name="user" value="@f.User" />
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-1" for="action">動作</label>
+            <select class="form-select" id="action" name="action">
+                <option value="">全部</option>
+                @foreach (var a in Model.Actions) { <option value="@a" selected="@(a == f.Action)">@a</option> }
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-1" for="entityType">對象</label>
+            <select class="form-select" id="entityType" name="entityType">
+                <option value="">全部</option>
+                @foreach (var e in Model.EntityTypes) { <option value="@e" selected="@(e == f.EntityType)">@e</option> }
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label small mb-1" for="q">關鍵字 / Id / IP</label>
+            <input type="search" class="form-control" id="q" name="q" value="@f.Q" />
+        </div>
+        <div class="col-12 d-flex justify-content-end gap-2">
+            <a class="btn btn-outline-secondary btn-sm" asp-action="Index">清除</a>
+            <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-funnel me-1"></i>查詢</button>
+        </div>
+    </div>
+</form>
+
+<div class="card">
+    @if (Model.Rows.TotalCount == 0)
+    {
+        <div class="card-body empty-state py-5"><div class="empty-state-icon"><i class="bi bi-journal-text"></i></div><p class="text-body-secondary mb-0">沒有符合條件的紀錄</p></div>
+    }
+    else
+    {
+        <ul class="list-group list-group-flush">
+            @foreach (var l in Model.Rows.Items)
+            {
+                <li class="list-group-item">
+                    <div class="d-flex flex-wrap justify-content-between gap-2">
+                        <div class="min-w-0">
+                            <span class="badge @ActionBadge(l.Action) me-1">@l.Action</span>
+                            <span class="small text-body-secondary">@l.EntityType@(l.EntityId != null ? $" #{l.EntityId}" : "")</span>
+                            <div class="mt-1">@l.Description</div>
+                        </div>
+                        <div class="text-end small text-body-secondary text-nowrap">
+                            <div>@l.At.ToString("yyyy/MM/dd HH:mm:ss")</div>
+                            <div><i class="bi bi-person"></i> @l.UserName @(l.IpAddress != null ? $"・{l.IpAddress}" : "")</div>
+                        </div>
+                    </div>
+                    @if (l.Changes.Count > 0)
+                    {
+                        <details class="mt-1 small">
+                            <summary class="text-primary">異動欄位（@l.Changes.Count）</summary>
+                            <table class="table table-sm table-bordered mt-2 mb-0 audit-changes">
+                                <thead class="table-light"><tr><th>欄位</th><th>修改前</th><th>修改後</th></tr></thead>
+                                <tbody>
+                                    @foreach (var c in l.Changes)
+                                    {
+                                        <tr><td class="text-nowrap">@c.Field</td><td class="text-danger-emphasis text-break">@(c.OldValue ?? "（空）")</td><td class="text-success-emphasis text-break">@(c.NewValue ?? "（空）")</td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </details>
+                    }
+                </li>
+            }
+        </ul>
+    }
+</div>
+<partial name="_Pager" model="Model.Pager" />

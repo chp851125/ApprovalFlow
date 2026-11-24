@@ -1,0 +1,61 @@
+@model WorkflowTemplateEditViewModel
+@{
+    var input = Model.Input;
+    const string rowPlaceholder = "__i__"; // 新增關卡時由 JS 換成實際序號
+    ViewData["Title"] = Model.IsNewVersion ? $"建立{input.DocumentType.ToDisplay()}流程新版本" : $"編輯{input.DocumentType.ToDisplay()}流程 v{Model.TemplateVersion}";
+}
+<div class="page-header">
+    <div>
+        <nav aria-label="breadcrumb"><ol class="breadcrumb small mb-1"><li class="breadcrumb-item"><a asp-action="Index">簽核流程</a></li><li class="breadcrumb-item active">@ViewData["Title"]</li></ol></nav>
+        <h1 class="page-title">@ViewData["Title"]</h1>
+        <div class="small text-body-secondary">儲存後為「草稿」，需按「啟用此版本」才會套用到新送出的單據。</div>
+    </div>
+</div>
+
+<form method="post" asp-action="Save" id="templateForm" novalidate>
+    <input type="hidden" name="Id" value="@input.Id" />
+    <input type="hidden" name="Version" value="@input.Version" />
+    <input type="hidden" name="SourceId" value="@input.SourceId" />
+    <input type="hidden" name="DocumentType" value="@input.DocumentType" />
+    <div asp-validation-summary="All" class="alert alert-danger small" role="alert"></div>
+
+    <div class="card form-card mb-3">
+        <div class="card-body row g-3">
+            <div class="col-md-5">
+                <label class="form-label required" for="Name">流程名稱</label>
+                <input class="form-control" id="Name" name="Name" value="@input.Name" maxlength="50" required />
+            </div>
+            <div class="col-md-7">
+                <label class="form-label" for="Description">版本說明</label>
+                <input class="form-control" id="Description" name="Description" value="@input.Description" maxlength="300" placeholder="例：配合新版授權辦法，五萬元以上增加總經理核決" />
+            </div>
+        </div>
+    </div>
+
+    <div class="form-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <h2 class="h6 mb-0"><i class="bi bi-diagram-2 me-1"></i>關卡（依序簽核）</h2>
+            <button type="button" class="btn btn-sm btn-outline-primary" data-step-add><i class="bi bi-plus-lg me-1"></i>新增關卡</button>
+        </div>
+        <div id="stepList">
+            @for (var i = 0; i < input.Steps.Count; i++)
+            {
+                <partial name="_StepRow" model="(input.Steps[i], i.ToString(), Model.Employees)" />
+            }
+        </div>
+        <div class="text-body-secondary small" id="stepEmpty" hidden>尚未設定關卡。</div>
+    </div>
+
+    <template id="stepTemplate">
+        <partial name="_StepRow" model="(new WorkflowStepInput(), rowPlaceholder, Model.Employees)" />
+    </template>
+
+    <div class="form-actions">
+        <a asp-action="@(Model.IsNewVersion ? "Index" : "Details")" asp-route-id="@(Model.IsNewVersion ? null : input.Id)" class="btn btn-outline-secondary">取消</a>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>@(Model.IsNewVersion ? "建立新版本（草稿）" : "儲存草稿")</button>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="~/js/workflow-template.js" asp-append-version="true"></script>
+}
